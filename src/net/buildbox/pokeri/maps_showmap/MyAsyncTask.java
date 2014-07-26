@@ -1,5 +1,10 @@
 package net.buildbox.pokeri.maps_showmap;
 
+import static java.lang.Math.PI;
+import static java.lang.Math.acos;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -16,154 +21,155 @@ import android.util.Log;
 public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 
 	GoogleMap map = null;
-	LatLng[] selectedArea = new LatLng[3];
 	String genre;
 	Marker marker = null;
-    WebApi webApi = null;
-    double oY = 0; //ŠOS‚Ìlat
-    double oX = 0; //ŠOS‚Ìlng
-    double distance = 0; //ŠOÚ‰~‚Ì”¼Œa
-	
-	//ƒRƒ“ƒXƒgƒ‰ƒNƒ^‚ÅƒƒCƒ“ƒXƒŒƒbƒh‚Ìmap‚ğó‚¯æ‚é
-		public MyAsyncTask(GoogleMap tmp, LatLng[] tmp2, String tmp3){
-			map = tmp;
-			selectedArea = tmp2;
-			genre = tmp3;
-		}
-	
+	WebApi webApi = null;
+	// double oY = 0; //ï¿½Oï¿½Sï¿½ï¿½lat
+	// double oX = 0; //ï¿½Oï¿½Sï¿½ï¿½lng
+	double latitude = 0;
+	double longitude = 0;
+	double distance = 0; // ï¿½Oï¿½Ú‰~ï¿½Ì”ï¿½ï¿½a
+
+	// ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^ï¿½Åƒï¿½ï¿½Cï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½bï¿½hï¿½ï¿½mapï¿½ï¿½ï¿½ó‚¯ï¿½ï¿½
+
+	public MyAsyncTask(GoogleMap map2, double latitude2, double longitude2,
+			int distance2, String item2) {
+
+		map = map2;
+		latitude = latitude2;
+		longitude = longitude2;
+		distance = distance2;
+		genre = item2;
+		// TODO è‡ªå‹•ç”Ÿæˆã•ã‚ŒãŸã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ãƒ¼ãƒ»ã‚¹ã‚¿ãƒ–
+	}
+
 	@Override
 	public String doInBackground(String... params) {
-		
-//---------------------------------------------------------------------------------------------
-        //ƒNƒGƒŠ‚É‘—‚éˆÊ’uÀ•W‚ğŒˆ‚ß‚é‚½‚ßAlŠpŒ`‚ÌÅ¬•ïŠÜ‰~‚Ì’†SÀ•W‚ğ‹‚ß‚éi‘I‘ğƒGƒŠƒA‚Ì’†S‚ğŒ³‚ÉA”¼ŒaxxƒLƒ“à‚Ì“X‚ğŒŸõA‚Æ‚¢‚¤Œ`‚ÅŒ‹‰Ê‚ği‚éj
-        //”CˆÓ‚Ì3’¸“_‚ÌŠOÚ‰~‚ğ‹‚ßAc‚è1“_‚ª“à•”‚É‚ ‚ê‚ÎOKB‚È‚¯‚ê‚Î•Ê‚Ì3“_‚Ì‘g‚İ‡‚í‚¹‚Å‚·
-        //‚QŸŒ³•½–Ê‚Ì‘z’è‚ÅŒvZ‚µ‚Ä‚¢‚é‚½‚ßAlŠpŒ`‚ª“ú•t•ÏXü‚ğ‚Ü‚½‚¢‚Å‚¢‚éê‡‚Í³Šm‚ÈŒ‹‰Ê‚ğo‚¹‚È‚¢
-        
-        double tmp[] = new double[6];
 
-        
-	    //ŠOS‚ğŒvZB—‹ü‚Í–¢ŒŸØEEE
-        tmp[0] = 2 * (selectedArea[1].longitude - selectedArea[0].longitude);
-        tmp[1] = 2 * (selectedArea[1].latitude - selectedArea[0].latitude);
-        tmp[2] = Math.pow(selectedArea[0].longitude,2) - Math.pow(selectedArea[1].longitude,2) + Math.pow(selectedArea[0].latitude,2) - Math.pow(selectedArea[1].latitude,2);
-        tmp[3] = 2 * (selectedArea[2].longitude - selectedArea[0].longitude);
-        tmp[4] = 2 * (selectedArea[2].latitude - selectedArea[0].latitude);
-        tmp[5] = Math.pow(selectedArea[0].longitude,2) - Math.pow(selectedArea[2].longitude,2) + Math.pow(selectedArea[0].latitude,2) - Math.pow(selectedArea[2].latitude,2);
-        //ŠOS‚ÌxÀ•Wlongitude
-        oX = ((tmp[1] * tmp[5]) - (tmp[4] * tmp[2])) / ((tmp[0] * tmp[4]) - (tmp[3] * tmp[1]));
-        //ŠOS‚ÌyÀ•Wlatitude
-        oY = ((tmp[2] * tmp[3]) - (tmp[5] * tmp[0])) / ((tmp[0] * tmp[4]) - (tmp[3] * tmp[1]));
-        
-        //ŠOS‚Ì”¼Œa
-        double dx = Math.pow(oX - selectedArea[0].longitude,2);
-        double dy = Math.pow(oY - selectedArea[0].latitude,2);
-        distance = Math.sqrt(dx + dy);
+		// ---------------------------------------------------------------------------------------------
 
-        Log.d("ŠOS‚ÌxÀ•W",""+oX);
-        Log.d("ŠOS‚ÌyÀ•W",""+oY);
+		// ---------------------------------------------------------------------------------------------
 
-//---------------------------------------------------------------------------------------------
+		// ï¿½gï¿½pï¿½ï¿½ï¿½ï¿½WebAPIï¿½Ì”ï¿½ï¿½ï¿½
+		if (genre.equals("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½")) {
+			webApi = new Api_Gnavi();
+		} else if (genre.equals("ï¿½ÏŒï¿½")) {
+			// ï¿½ï¿½ï¿½ï¿½APIï¿½ÌƒCï¿½ï¿½ï¿½Xï¿½^ï¿½ï¿½ï¿½Xï¿½ï¿½Ïï¿½ï¿½ï¿½ï¿½uwebApiï¿½vï¿½Åì¬ï¿½ï¿½ï¿½ï¿½
+			webApi = new Api_YahooLocalSearch();
+		}
 
-        // g—p‚·‚éWebAPI‚Ì”»’è
-        if(genre.equals("‹ğ‰®")){
-        	webApi = new Api_Gnavi();
-        }else if(genre.equals("ŠÏŒõ")){
-        	//‘¼‚ÌAPI‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğ•Ï”–¼uwebApiv‚Åì¬‚·‚é
-        	webApi = new Api_YahooLocalSearch();
-        }
-        
-        // ŠeíAPI‚Ö‚ÌŒŸõƒNƒGƒŠ‚Æ‚È‚éURL‚ğì¬
-        String queryUrl = webApi.createUrl(params[0],String.valueOf(oY),String.valueOf(oX));
-    	
-//---------------------------------------------------------------------------------------------
+		// ï¿½eï¿½ï¿½APIï¿½Ö‚ÌŒï¿½ï¿½ï¿½ï¿½Nï¿½Gï¿½ï¿½ï¿½Æ‚È‚ï¿½URLï¿½ï¿½ï¿½ì¬
+		String queryUrl = webApi.createUrl(params[0], String.valueOf(latitude),
+				String.valueOf(longitude));
+
+		// ---------------------------------------------------------------------------------------------
 		HttpURLConnection http = null;
-        InputStream in = null;
+		InputStream in = null;
 		URL url = null;
 		String result = "";
-        
-        try {
-			//URL‚ÉHTTPÚ‘±
-        	url = new URL(queryUrl);
-			http = (HttpURLConnection)url.openConnection();
+
+		try {
+			// URLï¿½ï¿½HTTPï¿½Ú‘ï¿½
+			url = new URL(queryUrl);
+			http = (HttpURLConnection) url.openConnection();
 			http.setRequestMethod("GET");
 			http.connect();
-			// InputStreamŒ^•Ï”in‚Éƒf[ƒ^‚ğƒ_ƒEƒ“ƒ[ƒh
+			// InputStreamï¿½^ï¿½Ïï¿½inï¿½Éƒfï¿½[ï¿½^ï¿½ï¿½ï¿½_ï¿½Eï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½h
 			in = http.getInputStream();
-			
-			// ŒŸõŒ‹‰Ê‚Ìxml‚©‚ç•K—v‚Èƒpƒ‰ƒ[ƒ^‚ğØ‚èo‚·
+
+			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê‚ï¿½xmlï¿½ï¿½ï¿½ï¿½Kï¿½vï¿½Èƒpï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½^ï¿½ï¿½Ø‚ï¿½oï¿½ï¿½
 			result = webApi.getResult(in);
 
-			//æ“¾‚µ‚½xmlƒeƒLƒXƒg‚ğonPostExcecute‚Éˆø‚«“n‚·
+			// ï¿½æ“¾ï¿½ï¿½ï¿½ï¿½xmlï¿½eï¿½Lï¿½Xï¿½gï¿½ï¿½onPostExcecuteï¿½Éˆï¿½ï¿½ï¿½ï¿½nï¿½ï¿½
 			return result;
 
-		} catch(Exception e) {
+		} catch (Exception e) {
 			return e.toString();
-	    } finally {
-	    	try {
-	    		if(http != null)
-	    			http.disconnect();
-	    		if(in != null) 
-	    			in.close();
-	    	}catch (Exception e) {}
-	    }
+		} finally {
+			try {
+				if (http != null)
+					http.disconnect();
+				if (in != null)
+					in.close();
+			} catch (Exception e) {
+			}
+		}
 	}
-	
-//	@Override
-	protected void onPostExecute(String src){
 
-		//ƒ}[ƒJ[‚ÌƒIƒvƒVƒ‡ƒ“—pƒCƒ“ƒXƒ^ƒ“ƒX
-		MarkerOptions options = new MarkerOptions();	
-		Marker marker;
-		
-		//1“X•Ü1s‚ÌŒ`‚ÅØ‚èo‚µ‚Ä”z—ñ‚ÉŠi”[
+	// @Override
+	protected void onPostExecute(String src) {
+
+		int m = 0;
+		// if(marker[m] != null){
+		// marker[m].remove();
+		// m++;
+		// }
+		// ï¿½}ï¿½[ï¿½Jï¿½[ï¿½ÌƒIï¿½vï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½pï¿½Cï¿½ï¿½ï¿½Xï¿½^ï¿½ï¿½ï¿½X
+		MarkerOptions options = new MarkerOptions();
+
+		// 1ï¿½Xï¿½ï¿½1ï¿½sï¿½ÌŒ`ï¿½ÅØ‚ï¿½oï¿½ï¿½ï¿½Ä”zï¿½ï¿½ÉŠiï¿½[
 		String[] strAry = src.split("\n");
-		
-		for (int i = 0 ; i < strAry.length ; i++) {
 
-			//1“X•Ü‚ÌŠeƒpƒ‰ƒ[ƒ^‚ğØ‚èo‚µ‚Ä”z—ñ‚ÉŠi”[
+		for (int i = 0; i < strAry.length; i++) {
+
+			// 1ï¿½Xï¿½Ü‚ÌŠeï¿½pï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½^ï¿½ï¿½Ø‚ï¿½oï¿½ï¿½ï¿½Ä”zï¿½ï¿½ÉŠiï¿½[
 			String[] strAry2 = strAry[i].split(",");
-			for (int j = 0 ; j < strAry2.length ; j++) {
+			for (int j = 0; j < strAry2.length; j++) {
 			}
 
-			//APIŸ‘æ‚Ålat,lng‚Ì‡”Ô‚ªˆá‚¤‚Ì‚ÅA‚»‚Ì‘Î‰‚à“ü‚ê‚é
-			//API–ˆ‚ÌØ‚èo‚µŒ^‚àAPIƒNƒ‰ƒX‚Ì’†‚É“ü‚ê‚é‚×‚«‚©B
-			//À•W‚Ì’l‚ğString‚©‚çDouble‚ÉŒ^•ÏŠ·
+			// APIï¿½ï¿½ï¿½ï¿½ï¿½lat,lngï¿½Ìï¿½ï¿½Ô‚ï¿½ï¿½á‚¤ï¿½Ì‚ÅAï¿½ï¿½ï¿½Ì‘Î‰ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			// APIï¿½ï¿½ï¿½ÌØ‚ï¿½oï¿½ï¿½ï¿½^ï¿½ï¿½APIï¿½Nï¿½ï¿½ï¿½Xï¿½Ì’ï¿½ï¿½É“ï¿½ï¿½ï¿½ï¿½×‚ï¿½ï¿½ï¿½ï¿½B
+			// ï¿½ï¿½ï¿½Wï¿½Ì’lï¿½ï¿½Stringï¿½ï¿½ï¿½ï¿½Doubleï¿½ÉŒ^ï¿½ÏŠï¿½
 
 			double lat = 0;
 			double lng = 0;
-			
+
 			try {
-				if (webApi.getClass() == this.getClass().getClassLoader().loadClass("net.buildbox.pokeri.maps_showmap.Api_Gnavi")){
-					lat = Double.parseDouble(strAry2[2]);//lat
-					lng = Double.parseDouble(strAry2[3]);//lng
-				}else {
-					lat = Double.parseDouble(strAry2[3]);//lng
-					lng = Double.parseDouble(strAry2[2]);//lat
+				if (webApi.getClass() == this
+						.getClass()
+						.getClassLoader()
+						.loadClass("net.buildbox.pokeri.maps_showmap.Api_Gnavi")) {
+					lat = Double.parseDouble(strAry2[2]);// lat
+					lng = Double.parseDouble(strAry2[3]);// lng
+				} else {
+					lat = Double.parseDouble(strAry2[3]);// lng
+					lng = Double.parseDouble(strAry2[2]);// lat
 				}
 			} catch (ClassNotFoundException e) {
-				// TODO ©“®¶¬‚³‚ê‚½ catch ƒuƒƒbƒN
+				// TODO ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ catch ï¿½uï¿½ï¿½ï¿½bï¿½N
 				e.printStackTrace();
 			}
-			
-			//À•W‚ªŠOÚ‰~‚Ì”ÍˆÍ“à‚©‚Ç‚¤‚©”»’è
-	        //ŠOS‚Æ“X‚Ì‹——£
-	        double dx2 = Math.pow(oX - lng,2);
-	        double dy2 = Math.pow(oY - lat,2);
-	        double distance2 = Math.sqrt(dx2 + dy2);
-	        
-	        //ŠOS‚Æ“X‚Ì‹——£‚ª”¼ŒaˆÈ“à‚Å‚ ‚ê‚ÎŠOÚ‰~‚Ì“à•”B”¼ŒaˆÈã‚È‚çŠO•”B
-	        if (distance2 <= distance) {
 
-		    	// •\¦ˆÊ’u‚ğ¶¬
-				// ‹É’[‚ÉÀ•W‚ª‹ß‚¢ê‡‚ÍŒã‚©‚ç¶¬‚³‚ê‚½ƒsƒ“‚ªŠù‘¶‚Ìƒsƒ“‚ğã‘‚«‚·‚é‚ç‚µ‚¢Bu‚æ‚©‚½‚¢v‚ÅŒŸõ‚·‚é‚Æ‚í‚©‚éB
-		    	LatLng posMapPoint = new LatLng(lat,lng);
-		    	
-				// ƒsƒ“‚Æƒ^ƒCƒgƒ‹i“X–¼j‚Ìİ’è
+			// ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½Oï¿½Ú‰~ï¿½Ì”ÍˆÍ“ï¿½ï¿½ï¿½ï¿½Ç‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			// ï¿½Oï¿½Sï¿½Æ“Xï¿½Ì‹ï¿½ï¿½ï¿½
+			double r = 6378.137; // èµ¤é“åŠå¾„[km]
+			// åº—ã®åº§æ¨™
+			double dy1 = lat * PI / 180;
+			double dx1 = lng * PI / 180;
+			// å¤–å¿ƒã®åº§æ¨™
+			double my1 = latitude * PI / 180;
+			double mx1 = longitude * PI / 180;
+			// å¤–å¿ƒã¨åº—ã®è·é›¢[m]
+			double distance2 = r
+					* acos(sin(dy1) * sin(my1) + cos(dy1) * cos(my1)
+							* cos(mx1 - dx1)) * 1000;
+
+			// ï¿½Oï¿½Sï¿½Æ“Xï¿½Ì‹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½aï¿½È“ï¿½ï¿½Å‚ï¿½ï¿½ï¿½ÎŠOï¿½Ú‰~ï¿½Ì“ï¿½ï¿½ï¿½ï¿½Bï¿½ï¿½ï¿½aï¿½Èï¿½È‚ï¿½Oï¿½ï¿½ï¿½B
+			if (distance2 <= distance) {
+
+				// ï¿½\ï¿½ï¿½ï¿½Ê’uï¿½ğ¶ï¿½
+				// ï¿½É’[ï¿½Éï¿½ï¿½Wï¿½ï¿½ï¿½ß‚ï¿½ï¿½ê‡ï¿½ÍŒã‚©ï¿½ç¶ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½sï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ìƒsï¿½ï¿½ï¿½ï¿½ï¿½ã‘ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ç‚µï¿½ï¿½ï¿½Bï¿½uï¿½æ‚©ï¿½ï¿½ï¿½ï¿½ï¿½vï¿½ÅŒï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ‚í‚©ï¿½ï¿½B
+				LatLng posMapPoint = new LatLng(lat, lng);
+
+				// ï¿½sï¿½ï¿½ï¿½Æƒ^ï¿½Cï¿½gï¿½ï¿½ï¿½iï¿½Xï¿½ï¿½ï¿½jï¿½Ìİ’ï¿½
 				options.position(posMapPoint);
 				options.title(strAry2[1]);
-				// ƒsƒ“‚Ì’Ç‰Á
+				// ï¿½sï¿½ï¿½ï¿½Ì’
+
+				// marker[m] = map.addMarker(options);
 				marker = map.addMarker(options);
-	        }
+				// m++;
+			}
 		}
 	}
 }

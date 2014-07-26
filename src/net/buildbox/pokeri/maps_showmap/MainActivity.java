@@ -30,9 +30,10 @@ import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.TextView;
 import android.widget.SearchView.OnQueryTextListener;
+import android.graphics.Color;
 
 //--------------------------------------------------------------------------------------------	
-//Œ»İ’n•\¦ŠÖ˜A
+//ï¿½ï¿½ï¿½İ’nï¿½\ï¿½ï¿½ï¿½Ö˜A
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
@@ -40,21 +41,22 @@ import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
 
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
-//--------------------------------------------------------------------------------------------	
-
-public class MainActivity extends FragmentActivity implements 
-	ConnectionCallbacks,
-	OnConnectionFailedListener,
-	LocationListener,
-	OnMyLocationButtonClickListener {
+import static java.lang.Math.*;
 
 //--------------------------------------------------------------------------------------------	
-//	ƒNƒ‰ƒX“à‹¤—p•Ï”‚Ìì¬
+
+public class MainActivity extends FragmentActivity implements
+		ConnectionCallbacks, OnConnectionFailedListener, LocationListener,
+		OnMyLocationButtonClickListener {
+
+	// --------------------------------------------------------------------------------------------
+	// ï¿½Nï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½ï¿½pï¿½Ïï¿½ï¿½Ìì¬
 
 	private FragmentManager fragmentManager;
 	private SupportMapFragment fragment;
@@ -62,247 +64,367 @@ public class MainActivity extends FragmentActivity implements
 	private CameraPosition.Builder builder;
 	private MarkerOptions options;
 	private Marker marker[] = new Marker[3];
+	private LatLng pointarray[] = new LatLng[3];
 	private int mflg = 0;
+	private int cflg = 0;
 	private String item;
+	private Circle circle;
 
-    private LocationClient mLocationClient;
-	
+	double oY = 0; // ï¿½Oï¿½Sï¿½ï¿½lat
+	double oX = 0; // ï¿½Oï¿½Sï¿½ï¿½lng
+	int distance = 0; // ï¿½Oï¿½Ú‰~ï¿½Ì”ï¿½ï¿½a
 
+	private LocationClient mLocationClient;
 
-//--------------------------------------------------------------------------------------------
-//	ƒ}ƒbƒvŠÖ˜A‚Ìˆ—
+	// --------------------------------------------------------------------------------------------
+	// ï¿½}ï¿½bï¿½vï¿½Ö˜Aï¿½Ìï¿½ï¿½ï¿½
 	/**
-	 * 4‚Â‚Ìƒsƒ“‚ğ—§‚Ä‚é
-	 * ƒsƒ“‚ğ—§‚Ä‚ÄˆÍ‚Á‚½”ÍˆÍ‚ÌF‚ğ•Ï‚¦‚é
-	 * ‚®‚é‚È‚Ñ“™‚ÌAPI‚Æ˜AŒg‚µ‚ÄŒŸõ‚·‚é
-	 * ŒŸõ‚µ‚½êŠ‚Éƒsƒ“‚ğ—§‚Ä‚é
+	 * 4ï¿½Â‚Ìƒsï¿½ï¿½ï¿½ğ—§‚Ä‚ï¿½ ï¿½sï¿½ï¿½ï¿½ğ—§‚Ä‚ÄˆÍ‚ï¿½ï¿½ï¿½ï¿½ÍˆÍ‚ÌFï¿½ï¿½Ï‚ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½È‚Ñ“ï¿½ï¿½ï¿½APIï¿½Æ˜Aï¿½gï¿½ï¿½ï¿½ÄŒï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½êŠï¿½Éƒsï¿½ï¿½ï¿½ğ—§‚Ä‚ï¿½
 	 */
-    
-    // These settings are the same as the settings for the map. They will in fact give you updates
-    // at the maximal rates currently possible.
-    private static final LocationRequest REQUEST = LocationRequest.create()
-            .setInterval(5000)         // 5 seconds
-            .setFastestInterval(16)    // 16ms = 60fps
-            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-	
+
+	// These settings are the same as the settings for the map. They will in
+	// fact give you updates
+	// at the maximal rates currently possible.
+	private static final LocationRequest REQUEST = LocationRequest.create()
+			.setInterval(5000) // 5 seconds
+			.setFastestInterval(16) // 16ms = 60fps
+			.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
 		fragmentManager = getSupportFragmentManager();
-		fragment = (SupportMapFragment) fragmentManager.findFragmentById(R.id.fragmentMap);
+		fragment = (SupportMapFragment) fragmentManager
+				.findFragmentById(R.id.fragmentMap);
 
-		// GoogleMap‚ÌƒCƒ“ƒXƒ^ƒ“ƒXæ“¾
+		// GoogleMapï¿½ÌƒCï¿½ï¿½ï¿½Xï¿½^ï¿½ï¿½ï¿½Xï¿½æ“¾
 		map = fragment.getMap();
-		// •\¦ˆÊ’ui“Œ‹‰wj‚Ì¶¬
+		// ï¿½\ï¿½ï¿½ï¿½Ê’uï¿½iï¿½ï¿½ï¿½ï¿½ï¿½wï¿½jï¿½Ìï¿½ï¿½ï¿½
 		LatLng posMapPoint = new LatLng(35.681382, 139.766084);
-		// “Œ‹‰w‚ğ•\¦
+		// ï¿½ï¿½ï¿½ï¿½ï¿½wï¿½ï¿½\ï¿½ï¿½
 		builder = new CameraPosition.Builder();
-		// ƒsƒ“‚Ìİ’è
+		// ï¿½sï¿½ï¿½ï¿½Ìİ’ï¿½
 		options = new MarkerOptions();
 
-		// Œ»İ’næ“¾‚ğ‹–‰Â
-	    map.setMyLocationEnabled(true);
-	    // Œ»İ’nƒ{ƒ^ƒ“ƒ^ƒbƒ`ƒCƒxƒ“ƒg‚ğæ“¾‚·‚é
-	    map.setOnMyLocationButtonClickListener(this);
-	    // Location Service‚ğg—p‚·‚é‚½‚ßALocationClientƒNƒ‰ƒX‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğ¶¬‚·‚é
-        mLocationClient = new LocationClient(
-                getApplicationContext(),
-                this,  // ConnectionCallbacks
-                this); // OnConnectionFailedListener
-		
+		// ï¿½ï¿½ï¿½İ’nï¿½æ“¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+		map.setMyLocationEnabled(true);
+		// ï¿½ï¿½ï¿½İ’nï¿½{ï¿½^ï¿½ï¿½ï¿½^ï¿½bï¿½`ï¿½Cï¿½xï¿½ï¿½ï¿½gï¿½ï¿½ï¿½æ“¾ï¿½ï¿½ï¿½ï¿½
+		map.setOnMyLocationButtonClickListener(this);
+		// Location
+		// Serviceï¿½ï¿½ï¿½gï¿½pï¿½ï¿½ï¿½é‚½ï¿½ßALocationClientï¿½Nï¿½ï¿½ï¿½Xï¿½ÌƒCï¿½ï¿½ï¿½Xï¿½^ï¿½ï¿½ï¿½Xï¿½ğ¶ï¿½ï¿½ï¿½ï¿½ï¿½
+		mLocationClient = new LocationClient(getApplicationContext(), this, // ConnectionCallbacks
+				this); // OnConnectionFailedListener
+
 		MapsInitializer.initialize(this);
 
-		// “Œ‹‰w‚ğ•\¦
-		builder.target(posMapPoint);	// ƒJƒƒ‰‚Ì•\¦ˆÊ’u‚Ìw’è
-		builder.zoom(13.0f);	// ƒJƒƒ‰‚ÌƒY[ƒ€ƒŒƒxƒ‹‚Ìw’è
-		builder.bearing(0);		// ƒJƒƒ‰‚ÌŒü‚«‚Ìw’è
-		builder.tilt(25.0f);	// ƒJƒƒ‰‚ÌŒX‚«‚Ìw’è
+		// ï¿½ï¿½ï¿½ï¿½ï¿½wï¿½ï¿½\ï¿½ï¿½
+		builder.target(posMapPoint); // ï¿½Jï¿½ï¿½ï¿½ï¿½ï¿½Ì•\ï¿½ï¿½ï¿½Ê’uï¿½Ìwï¿½ï¿½
+		builder.zoom(13.0f); // ï¿½Jï¿½ï¿½ï¿½ï¿½ï¿½ÌƒYï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½xï¿½ï¿½ï¿½Ìwï¿½ï¿½
+		builder.bearing(0); // ï¿½Jï¿½ï¿½ï¿½ï¿½ï¿½ÌŒï¿½ï¿½ï¿½ï¿½Ìwï¿½ï¿½
+		builder.tilt(25.0f); // ï¿½Jï¿½ï¿½ï¿½ï¿½ï¿½ÌŒXï¿½ï¿½ï¿½Ìwï¿½ï¿½
 		map.moveCamera(CameraUpdateFactory.newCameraPosition(builder.build()));
-		
-		// ƒsƒ“ã‚Ìî•ñ‚ªƒNƒŠƒbƒN‚³‚ê‚½‚ÌƒCƒxƒ“ƒgˆ—
-//		map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-//			@Override
-//			public void onInfoWindowClick(Marker marker) {
-//				Toast.makeText(getApplicationContext(), "“Œ‹‰w‚ªƒNƒŠƒbƒN‚³‚ê‚Ü‚µ‚½B", Toast.LENGTH_SHORT).show();
-//			}
-//		});
-		
-		// ƒ}ƒbƒvã‚ÌƒNƒŠƒbƒNƒCƒxƒ“ƒgˆ—
+
+		// ï¿½sï¿½ï¿½ï¿½ï¿½Ìï¿½ñ‚ªƒNï¿½ï¿½ï¿½bï¿½Nï¿½ï¿½ï¿½ê‚½ï¿½ï¿½ï¿½ÌƒCï¿½xï¿½ï¿½ï¿½gï¿½ï¿½ï¿½ï¿½
+		// map.setOnInfoWindowClickListener(new
+		// GoogleMap.OnInfoWindowClickListener() {
+		// @Override
+		// public void onInfoWindowClick(Marker marker) {
+		// Toast.makeText(getApplicationContext(), "ï¿½ï¿½ï¿½ï¿½ï¿½wï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½bï¿½Nï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½ï¿½B",
+		// Toast.LENGTH_SHORT).show();
+		// }
+		// });
+
+		// ï¿½}ï¿½bï¿½vï¿½ï¿½ÌƒNï¿½ï¿½ï¿½bï¿½Nï¿½Cï¿½xï¿½ï¿½ï¿½gï¿½ï¿½ï¿½ï¿½
 		map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-		    @Override
-		    public void onMapClick(LatLng point) {
-		        Toast.makeText(getApplicationContext(),
-		        		"ƒNƒŠƒbƒN‚³‚ê‚½À•W‚Í " + point.latitude + ", " + point.longitude, Toast.LENGTH_SHORT).show();
-		    	// 3‚Â‚Ìƒ}[ƒJ[‚ª•\¦‚³‚ê‚Ä‚¢‚ê‚Îƒ}[ƒJ[‚ğ¶¬‚µ‚È‚¢
-		    	if (mflg < 3) {
-			    	// •\¦ˆÊ’uiƒ^ƒbƒv‚³‚ê‚½À•Wj‚Ì¶¬
-					options.position(new LatLng(point.latitude, point.longitude));
-					// ƒsƒ“‚Ìƒ^ƒCƒgƒ‹İ’è
-					options.title("ƒ}[ƒJ["+mflg+"À•W‚Í " + point.latitude + ", " + point.longitude);
-					// ƒsƒ“‚ÌF‚Ìİ’è
-					BitmapDescriptor icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE);
+			@Override
+			public void onMapClick(LatLng point) {
+				Toast.makeText(
+						getApplicationContext(),
+						"ï¿½Nï¿½ï¿½ï¿½bï¿½Nï¿½ï¿½ï¿½ê‚½ï¿½ï¿½ï¿½Wï¿½ï¿½ " + point.latitude + ", "
+								+ point.longitude, Toast.LENGTH_SHORT).show();
+				// 3ï¿½Â‚Ìƒ}ï¿½[ï¿½Jï¿½[ï¿½ï¿½ï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½Îƒ}ï¿½[ï¿½Jï¿½[ï¿½ğ¶ï¿½ï¿½ï¿½ï¿½È‚ï¿½
+
+				if (mflg < 3) {
+					pointarray[mflg] = point;
+					// ï¿½\ï¿½ï¿½ï¿½Ê’uï¿½iï¿½^ï¿½bï¿½vï¿½ï¿½ï¿½ê‚½ï¿½ï¿½ï¿½Wï¿½jï¿½Ìï¿½ï¿½ï¿½
+					options.position(new LatLng(pointarray[mflg].latitude,
+							pointarray[mflg].longitude));
+					// ï¿½sï¿½ï¿½ï¿½Ìƒ^ï¿½Cï¿½gï¿½ï¿½ï¿½İ’ï¿½
+					options.title("ï¿½}ï¿½[ï¿½Jï¿½[" + mflg + "ï¿½ï¿½ï¿½Wï¿½ï¿½ "
+							+ pointarray[mflg].latitude + ", "
+							+ pointarray[mflg].longitude);
+					// ï¿½sï¿½ï¿½ï¿½ÌFï¿½Ìİ’ï¿½
+					BitmapDescriptor icon = BitmapDescriptorFactory
+							.defaultMarker(BitmapDescriptorFactory.HUE_BLUE);
 					options.icon(icon);
-					// ƒsƒ“‚Ì’Ç‰Á
+					// ï¿½sï¿½ï¿½ï¿½Ì’Ç‰ï¿½
 					marker[mflg] = map.addMarker(options);
-					// ƒsƒ“‚ğ’·‰Ÿ‚µ‚Åƒhƒ‰ƒbƒO‰Â”\‚É
+					// ï¿½sï¿½ï¿½ï¿½ğ’·‰ï¿½ï¿½ï¿½ï¿½Åƒhï¿½ï¿½ï¿½bï¿½Oï¿½Â”\ï¿½ï¿½
 					marker[mflg].setDraggable(true);
-					// ƒsƒ“”‚ÌƒJƒEƒ“ƒg‚ğ’Ç‰Á
+					// ï¿½sï¿½ï¿½ï¿½ï¿½ï¿½ÌƒJï¿½Eï¿½ï¿½ï¿½gï¿½ï¿½Ç‰ï¿½
 					mflg++;
-		    	}
-		    }
+				}
+				if (mflg >= 3) {
+
+					if (cflg == 0) {
+						makeCircle();
+						cflg = cflg + 1;
+					}
+
+				}
+			}
 		});
-		
-		// ƒ}ƒbƒvã‚Ì’·‰Ÿ‚µƒCƒxƒ“ƒgˆ—
+
+		map.setOnMarkerDragListener(new OnMarkerDragListener() {
+			@Override
+			public void onMarkerDrag(Marker marker2) {
+				// TODO Auto-generated method stub
+				// Toast.makeText(getApplicationContext(), "ãƒãƒ¼ã‚«ãƒ¼ãƒ‰ãƒ©ãƒƒã‚°ä¸­",
+				// Toast.LENGTH_SHORT).show();
+				if (mflg >= 3) {
+					// ãƒ‰ãƒ©ãƒƒã‚°å¾Œãƒãƒ¼ã‚«ãƒ¼åº§æ¨™å–å¾—
+					pointarray[0] = marker[0].getPosition();
+					pointarray[1] = marker[1].getPosition();
+					pointarray[2] = marker[2].getPosition();
+					// å‰ã®å††ã‚’å‰Šé™¤ã—å†æç”»
+					circle.remove();
+					makeCircle();
+				}
+
+			}
+
+			@Override
+			public void onMarkerDragEnd(Marker marker2) {
+
+				// TODO Auto-generated method stub
+				// Toast.makeText(getApplicationContext(), "ãƒãƒ¼ã‚«ãƒ¼ãƒ‰ãƒ©ãƒƒã‚°çµ‚äº†",
+				// Toast.LENGTH_LONG).show();
+			}
+
+			@Override
+			public void onMarkerDragStart(Marker marker2) {
+
+				// TODO Auto-generated method stub
+				// Toast.makeText(getApplicationContext(), "ãƒãƒ¼ã‚«ãƒ¼ãƒ‰ãƒ©ãƒƒã‚°é–‹å§‹",
+				// Toast.LENGTH_LONG).show();
+			}
+		});
+
+		// ï¿½}ï¿½bï¿½vï¿½ï¿½Ì’ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Cï¿½xï¿½ï¿½ï¿½gï¿½ï¿½ï¿½ï¿½
 		map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-		    @Override
-		    public void onMapLongClick(LatLng point) {
-		    	
-		    	CircleOptions circleOptions = new CircleOptions()
-		        .center(new LatLng(point.latitude,point.longitude))
-		        .radius(1000); 
-		    	map.addCircle(circleOptions);
-		    	
-		    	Toast.makeText(getApplicationContext(),
-		        		"’·‰Ÿ‚µ‚³‚ê‚½À•W‚Í " + point.latitude + ", " + point.longitude, Toast.LENGTH_SHORT).show();
-		    }
+			@Override
+			public void onMapLongClick(LatLng point) {
+
+				Toast.makeText(
+						getApplicationContext(),
+						"ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½ï¿½ï¿½Wï¿½ï¿½ " + point.latitude + ", "
+								+ point.longitude, Toast.LENGTH_SHORT).show();
+			}
 		});
-		
-//--------------------------------------------------------------------------------------------
-//		ƒXƒsƒi[‚Ìİ’è
+
+		// --------------------------------------------------------------------------------------------
+		// ï¿½Xï¿½sï¿½iï¿½[ï¿½Ìİ’ï¿½
 		/**
-		 * ŒŸõƒ{ƒbƒNƒX‚ğ—pˆÓ‚·‚éiƒAƒNƒVƒ‡ƒ“ƒo[Hj
-		 * ‚®‚é‚È‚Ñ“™‚ÌAPI‚ÉƒL[ƒ[ƒh‚Æƒsƒ“‚ÌÀ•W‚ğˆø‚«“n‚·
+		 * ï¿½ï¿½ï¿½ï¿½ï¿½{ï¿½bï¿½Nï¿½Xï¿½ï¿½pï¿½Ó‚ï¿½ï¿½ï¿½iï¿½Aï¿½Nï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½oï¿½[ï¿½Hï¿½j
+		 * ï¿½ï¿½ï¿½ï¿½È‚Ñ“ï¿½ï¿½ï¿½APIï¿½ÉƒLï¿½[ï¿½ï¿½ï¿½[ï¿½hï¿½Æƒsï¿½ï¿½ï¿½Ìï¿½ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½nï¿½ï¿½
 		 */
-		
-		String[] items = {"‹ğ‰®", "ƒJƒtƒF", "ŠÏŒõ"};
-		
+
+		String[] items = { "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", "ï¿½Jï¿½tï¿½F", "ï¿½ÏŒï¿½" };
+
 		Spinner spinnerGenre = (Spinner) findViewById(R.id.spinnerGenre);
-		// ƒAƒ_ƒvƒ^‚ÉƒAƒCƒeƒ€‚ğ’Ç‰Á
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-				this,
-				android.R.layout.simple_spinner_item,
-				items);
+		// ï¿½Aï¿½_ï¿½vï¿½^ï¿½ÉƒAï¿½Cï¿½eï¿½ï¿½ï¿½ï¿½Ç‰ï¿½
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+				android.R.layout.simple_spinner_item, items);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		// ƒAƒ_ƒvƒ^‚Ìİ’è
+		// ï¿½Aï¿½_ï¿½vï¿½^ï¿½Ìİ’ï¿½
 		spinnerGenre.setAdapter(adapter);
-		// ƒXƒsƒi[‚Ìƒ^ƒCƒgƒ‹İ’è
-		spinnerGenre.setPrompt("ƒWƒƒƒ“ƒ‹‚Ì‘I‘ğ");
-		// ƒ|ƒWƒVƒ‡ƒ“‚Ìw’è
+		// ï¿½Xï¿½sï¿½iï¿½[ï¿½Ìƒ^ï¿½Cï¿½gï¿½ï¿½ï¿½İ’ï¿½
+		spinnerGenre.setPrompt("ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì‘Iï¿½ï¿½");
+		// ï¿½|ï¿½Wï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Ìwï¿½ï¿½
 		spinnerGenre.setSelection(0);
-		
-		spinnerGenre.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view,
-					int position, long id) {
-				Spinner spnGenre = (Spinner) parent;
-				item = (String) spnGenre.getItemAtPosition(position);
 
-//		    	Toast.makeText(getApplicationContext(),"‘I‘ğ‚³‚ê‚½ƒAƒCƒeƒ€‚Í " + item, Toast.LENGTH_SHORT).show();
-			}
-			@Override
-			public void onNothingSelected(AdapterView<?> parent) {
-			}
-		});
+		spinnerGenre
+				.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+					@Override
+					public void onItemSelected(AdapterView<?> parent,
+							View view, int position, long id) {
+						Spinner spnGenre = (Spinner) parent;
+						item = (String) spnGenre.getItemAtPosition(position);
 
-		//--------------------------------------------------------------------------------------------
-//		‚»‚Ì‘¼
+						// Toast.makeText(getApplicationContext(),"ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½ê‚½ï¿½Aï¿½Cï¿½eï¿½ï¿½ï¿½ï¿½ "
+						// + item, Toast.LENGTH_SHORT).show();
+					}
+
+					@Override
+					public void onNothingSelected(AdapterView<?> parent) {
+					}
+				});
+
+		// --------------------------------------------------------------------------------------------
+		// ï¿½ï¿½ï¿½Ì‘ï¿½
 		/**
-		 * ƒGƒŠƒAİ’è‚ÌƒŠƒZƒbƒg
+		 * ï¿½Gï¿½ï¿½ï¿½Aï¿½İ’ï¿½Ìƒï¿½ï¿½Zï¿½bï¿½g
 		 * 
 		 */
-		
-		
+
 	}
-	
-	 // Implementation of {@link LocationListener}.
-    @Override
-    public void onLocationChanged(Location location) {
-     // Do nothing
-    }
-    // Callback called when connected to GCore. Implementation of {@link ConnectionCallbacks}.
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        mLocationClient.requestLocationUpdates(REQUEST,this);  // this = LocationListener
-    }
-    // Callback called when disconnected from GCore. Implementation of {@link ConnectionCallbacks}.
-    @Override
-    public void onDisconnected() {
-        // Do nothing
-    }
-    // Implementation of {@link OnConnectionFailedListener}.
-    @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        // Do nothing
-    }
-    @Override
-    public boolean onMyLocationButtonClick() {
-        Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT).show();
-        // Return false so that we don't consume the event and the default behavior still occurs
-        // (the camera animates to the user's current position).
-        return false;
-    }
 
-//--------------------------------------------------------------------------------------------
-//	ƒAƒNƒVƒ‡ƒ“ƒo[‚ÌŒŸõƒ{ƒbƒNƒX
-    
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+	// ä¸‰ç‚¹ã®å¤–æ¥å††æç”»
+	public void makeCircle() {
 
-        // SearchView‚ğŒÄ‚Ño‚·
-        final MenuItem searchMenu = menu.findItem(R.id.menu_search);
-        final SearchView searchView = (SearchView) searchMenu.getActionView();
+		double tmp[] = new double[6];
+		// å¤–å¿ƒã‚’è¨ˆç®—ã€‚ç†å±ˆã¯æœªæ¤œè¨¼ãƒ»ãƒ»ãƒ»
+		tmp[0] = 2 * (pointarray[1].longitude - pointarray[0].longitude);
+		tmp[1] = 2 * (pointarray[1].latitude - pointarray[0].latitude);
+		tmp[2] = Math.pow(pointarray[0].longitude, 2)
+				- Math.pow(pointarray[1].longitude, 2)
+				+ Math.pow(pointarray[0].latitude, 2)
+				- Math.pow(pointarray[1].latitude, 2);
+		tmp[3] = 2 * (pointarray[2].longitude - pointarray[0].longitude);
+		tmp[4] = 2 * (pointarray[2].latitude - pointarray[0].latitude);
+		tmp[5] = Math.pow(pointarray[0].longitude, 2)
+				- Math.pow(pointarray[2].longitude, 2)
+				+ Math.pow(pointarray[0].latitude, 2)
+				- Math.pow(pointarray[2].latitude, 2);
+		// å¤–å¿ƒã®xåº§æ¨™ï¼longitude
+		oX = ((tmp[1] * tmp[5]) - (tmp[4] * tmp[2]))
+				/ ((tmp[0] * tmp[4]) - (tmp[3] * tmp[1]));
+		// å¤–å¿ƒã®yåº§æ¨™ï¼latitude
+		oY = ((tmp[2] * tmp[3]) - (tmp[5] * tmp[0]))
+				/ ((tmp[0] * tmp[4]) - (tmp[3] * tmp[1]));
 
-        // ŒŸõƒAƒCƒRƒ“‚ğŒŸõƒ{ƒbƒNƒX‚Ì“à‘¤‚É”z’u
-        searchView.setIconifiedByDefault(false);
+		// double dx = Math.pow(oX - pointarray[0].longitude / 0.0091, 2);
+		// double dy = Math.pow(oY - pointarray[0].latitude /0.0111, 2);
 
-        // ŒŸõŠJnƒ{ƒ^ƒ“‚ğ•\¦
-        searchView.setSubmitButtonEnabled(true);
+		// å¤–å¿ƒã®åŠå¾„ã‚’è¨ˆç®—ã€€
+		double r = 6378.137; // èµ¤é“åŠå¾„[km]
+		// å¤–å¿ƒ
+		double dy1 = oY * PI / 180;
+		double dx1 = oX * PI / 180;
+		// 1å€‹ç›®ã®ãƒãƒ¼ã‚«ãƒ¼
+		double my1 = pointarray[0].latitude * PI / 180;
+		double mx1 = pointarray[0].longitude * PI / 180;
+		// å¤–å¿ƒã¨ãƒãƒ¼ã‚«ãƒ¼ã®è·é›¢[m]
+		double dist = r
+				* acos(sin(dy1) * sin(my1) + cos(dy1) * cos(my1)
+						* cos(mx1 - dx1)) * 1000;
 
-        // ŒŸõ•¶š—ñ‚ğ“ü—Í‚µ‚½Û‚âŒŸõÀs‚ÉŒÄ‚Î‚ê‚éƒŠƒXƒi[‚ğİ’è
-        searchView.setOnQueryTextListener(new OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                // ƒAƒNƒVƒ‡ƒ“ƒo[‚ğæ“¾
-                ActionBar actionBar = getActionBar();
-                // ƒ}[ƒJ[‚ÌÀ•WŠi”[—p•Ï”
-                LatLng currentPoint[] = new LatLng[3];
+		distance = (int) dist;
 
-                // ŒŸõƒL[ƒ[ƒh‚ğƒ^ƒCƒgƒ‹‚Éİ’è
-                actionBar.setTitle(query);
-                
-                // ŒŸõƒL[ƒ[ƒh‚ğÀ•W‚Æ‹¤‚ÉWebApi‚Öˆø‚«“n‚·iposMapPoint‚Í”z—ñŒ^B4“_‚Ü‚Æ‚ß‚Ä“n‚µ‚Ä‚¢‚éj
-                // 3“_‚ªİ’è‚³‚ê‚Ä‚¢‚È‚¢ê‡‚ÍƒƒbƒZ[ƒW‚ğ•\¦‚·‚é
-                if (mflg == 3) {
-                //3“_‚ÌŒ»İÀ•W‚ğŠi”[‚·‚é
-	                for (int i = 0 ; i < 3 ; i++){
-	                	currentPoint[i] = marker[i].getPosition();
-	                }
-	                new MyAsyncTask(map,currentPoint,item).execute(query);
-                }else{
-    		        Toast.makeText(getApplicationContext(),
-    		        		"ŒŸõ”ÍˆÍ‚Ìw’è‚ª•s‘«‚µ‚Ä‚¢‚Ü‚·B3“_‚Åw’è‚µ‚Ä‚­‚¾‚³‚¢B", Toast.LENGTH_SHORT).show();
-                }
-                
-                // ƒfƒtƒHƒ‹ƒg‚Å•\¦‚³‚ê‚éƒ\ƒtƒgƒEƒFƒAƒL[ƒ{[ƒh‚ğ”ñ•\¦
-                InputMethodManager inputMethodManager =
-                        (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputMethodManager.hideSoftInputFromWindow(
-                        searchView.getWindowToken(), 0);
+		Log.d("å¤–å¿ƒã®xåº§æ¨™", "" + oX);
+		Log.d("å¤–å¿ƒã®yåº§æ¨™", "" + oY);
+		Log.d("åŠå¾„", "" + distance);
 
-                // ŒŸõƒ{ƒbƒNƒX‚ğ•Â‚¶‚é
-                searchMenu.collapseActionView();
+		CircleOptions circleOptions = new CircleOptions()
+				.center(new LatLng(oY, oX)).radius(distance)
+				.strokeColor(Color.rgb(200, 0, 255))
+				.fillColor(Color.argb(80, 200, 0, 255));
+		circle = map.addCircle(circleOptions);
+	};
 
-                return false;
-            }
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                // ŒŸõƒ{ƒbƒNƒX‚Ì“à—e‚ª•ÏX‚³‚ê‚½Û‚ÉÀs
-                return false;
-            }
-        });
-        return true;
-    }
+	// Implementation of {@link LocationListener}.
+
+	@Override
+	public void onLocationChanged(Location location) {
+		// Do nothing
+	}
+
+	// Callback called when connected to GCore. Implementation of {@link
+	// ConnectionCallbacks}.
+	@Override
+	public void onConnected(Bundle connectionHint) {
+		mLocationClient.requestLocationUpdates(REQUEST, this); // this =
+																// LocationListener
+	}
+
+	// Callback called when disconnected from GCore. Implementation of {@link
+	// ConnectionCallbacks}.
+	@Override
+	public void onDisconnected() {
+		// Do nothing
+	}
+
+	// Implementation of {@link OnConnectionFailedListener}.
+	@Override
+	public void onConnectionFailed(ConnectionResult result) {
+		// Do nothing
+	}
+
+	@Override
+	public boolean onMyLocationButtonClick() {
+		Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT)
+				.show();
+		// Return false so that we don't consume the event and the default
+		// behavior still occurs
+		// (the camera animates to the user's current position).
+		return false;
+	}
+
+	// --------------------------------------------------------------------------------------------
+	// ï¿½Aï¿½Nï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½oï¿½[ï¿½ÌŒï¿½ï¿½ï¿½ï¿½{ï¿½bï¿½Nï¿½X
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.main, menu);
+
+		// SearchViewï¿½ï¿½ï¿½Ä‚Ñoï¿½ï¿½
+		final MenuItem searchMenu = menu.findItem(R.id.menu_search);
+		final SearchView searchView = (SearchView) searchMenu.getActionView();
+
+		// ï¿½ï¿½ï¿½ï¿½ï¿½Aï¿½Cï¿½Rï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½{ï¿½bï¿½Nï¿½Xï¿½Ì“ï¿½ï¿½ï¿½ï¿½É”zï¿½u
+		searchView.setIconifiedByDefault(false);
+
+		// ï¿½ï¿½ï¿½ï¿½ï¿½Jï¿½nï¿½{ï¿½^ï¿½ï¿½ï¿½ï¿½\ï¿½ï¿½
+		searchView.setSubmitButtonEnabled(true);
+
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í‚ï¿½ï¿½ï¿½ï¿½Û‚âŒŸï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½ÉŒÄ‚Î‚ï¿½éƒŠï¿½Xï¿½iï¿½[ï¿½ï¿½İ’ï¿½
+		searchView.setOnQueryTextListener(new OnQueryTextListener() {
+			@Override
+			public boolean onQueryTextSubmit(String query) {
+				// ï¿½Aï¿½Nï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½oï¿½[ï¿½ï¿½ï¿½æ“¾
+				ActionBar actionBar = getActionBar();
+				// ï¿½}ï¿½[ï¿½Jï¿½[ï¿½Ìï¿½ï¿½Wï¿½iï¿½[ï¿½pï¿½Ïï¿½
+				double latitude = oY;
+				double longitude = oX;
+
+				// ï¿½ï¿½ï¿½ï¿½ï¿½Lï¿½[ï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½^ï¿½Cï¿½gï¿½ï¿½ï¿½Éİ’ï¿½
+				actionBar.setTitle(query);
+
+				// ï¿½ï¿½ï¿½ï¿½ï¿½Lï¿½[ï¿½ï¿½ï¿½[ï¿½hï¿½ï¿½ï¿½ï¿½ï¿½Wï¿½Æ‹ï¿½ï¿½ï¿½WebApiï¿½Öˆï¿½ï¿½ï¿½ï¿½nï¿½ï¿½ï¿½iposMapPointï¿½Í”zï¿½ï¿½^ï¿½B4ï¿½_ï¿½Ü‚Æ‚ß‚Ä“nï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½j
+				// 3ï¿½_ï¿½ï¿½ï¿½İ’è‚³ï¿½ï¿½Ä‚ï¿½ï¿½È‚ï¿½ï¿½ê‡ï¿½Íƒï¿½ï¿½bï¿½Zï¿½[ï¿½Wï¿½ï¿½\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+				// if (mflg == 3) {
+				// 3ï¿½_ï¿½ÌŒï¿½ï¿½İï¿½ï¿½Wï¿½ï¿½ï¿½iï¿½[ï¿½ï¿½ï¿½ï¿½
+				// for (int i = 0 ; i < 3 ; i++){
+				// currentPoint[i] = marker[i].getPosition();
+				// }
+				new MyAsyncTask(map, latitude, longitude, distance, item)
+						.execute(query);
+				// }else{
+				// Toast.makeText(getApplicationContext(),
+				// "ï¿½ï¿½ï¿½ï¿½ï¿½ÍˆÍ‚Ìwï¿½è‚ªï¿½sï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½Ü‚ï¿½ï¿½B3ï¿½_ï¿½Åwï¿½è‚µï¿½Ä‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B",
+				// Toast.LENGTH_SHORT).show();
+				// }
+
+				// ï¿½fï¿½tï¿½Hï¿½ï¿½ï¿½gï¿½Å•\ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\ï¿½tï¿½gï¿½Eï¿½Fï¿½Aï¿½Lï¿½[ï¿½{ï¿½[ï¿½hï¿½ï¿½ï¿½\ï¿½ï¿½
+				InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				inputMethodManager.hideSoftInputFromWindow(
+						searchView.getWindowToken(), 0);
+
+				// ï¿½ï¿½ï¿½ï¿½ï¿½{ï¿½bï¿½Nï¿½Xï¿½ï¿½Â‚ï¿½ï¿½ï¿½
+				searchMenu.collapseActionView();
+
+				return false;
+			}
+
+			@Override
+			public boolean onQueryTextChange(String newText) {
+				// ï¿½ï¿½ï¿½ï¿½ï¿½{ï¿½bï¿½Nï¿½Xï¿½Ì“ï¿½ï¿½eï¿½ï¿½ï¿½ÏXï¿½ï¿½ï¿½ê‚½ï¿½Û‚Éï¿½ï¿½s
+				return false;
+			}
+		});
+		return true;
+	}
 }
