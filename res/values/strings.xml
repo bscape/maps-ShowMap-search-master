@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">maps_ShowMap</string>
+    <string name="app_name">幹事お助け！</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_search">Search</string>
-
+    <string name="result">Result</string>
+    <string name="beer">居酒屋を探す！</string>
+    <string name="title_activity_top">Top</string>
 </resources>

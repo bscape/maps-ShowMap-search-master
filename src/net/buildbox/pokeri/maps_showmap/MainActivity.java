@@ -1,6 +1,5 @@
 package net.buildbox.pokeri.maps_showmap;
 
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapsInitializer;
@@ -14,7 +13,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import android.R.menu;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -22,18 +20,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.Toast;
-import android.widget.TextView;
 import android.widget.SearchView.OnQueryTextListener;
 import android.graphics.Color;
 
 //--------------------------------------------------------------------------------------------	
-//���ݒn�\���֘A
+//現在地表示関連
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
@@ -42,9 +40,9 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
+import com.navdrawer.SimpleSideDrawer;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
 import static java.lang.Math.*;
@@ -55,8 +53,8 @@ public class MainActivity extends FragmentActivity implements
 		ConnectionCallbacks, OnConnectionFailedListener, LocationListener,
 		OnMyLocationButtonClickListener {
 
-	// --------------------------------------------------------------------------------------------
-	// �N���X�����p�ϐ��̍쐬
+	//--------------------------------------------------------------------------------------------	
+	//	クラス内共用変数の作成
 
 	private FragmentManager fragmentManager;
 	private SupportMapFragment fragment;
@@ -69,23 +67,26 @@ public class MainActivity extends FragmentActivity implements
 	private int cflg = 0;
 	private String item;
 	private Circle circle;
+	
+	private SimpleSideDrawer mNav;
 
-	double oY = 0; // �O�S��lat
-	double oX = 0; // �O�S��lng
-	int distance = 0; // �O�ډ~�̔��a
+	double oY = 0; // �ｿｽO�ｿｽS�ｿｽ�ｿｽlat
+	double oX = 0; // �ｿｽO�ｿｽS�ｿｽ�ｿｽlng
+	int distance = 0; // �ｿｽO�ｿｽﾚ円�ｿｽﾌ費ｿｽ�ｿｽa
 
 	private LocationClient mLocationClient;
 
-	// --------------------------------------------------------------------------------------------
-	// �}�b�v�֘A�̏���
+	//--------------------------------------------------------------------------------------------
+	//	マップ関連の処理
 	/**
-	 * 4�̃s���𗧂Ă� �s���𗧂ĂĈ͂����͈͂̐F��ς��� ����Ȃѓ���API�ƘA�g���Č�������
-	 * ���������ꏊ�Ƀs���𗧂Ă�
+	 * 4つのピンを立てる
+	 * ピンを立てて囲った範囲の色を変える
+	 * ぐるなび等のAPIと連携して検索する
+	 * 検索した場所にピンを立てる
 	 */
-
-	// These settings are the same as the settings for the map. They will in
-	// fact give you updates
-	// at the maximal rates currently possible.
+    
+    // These settings are the same as the settings for the map. They will in fact give you updates
+    // at the maximal rates currently possible.
 	private static final LocationRequest REQUEST = LocationRequest.create()
 			.setInterval(5000) // 5 seconds
 			.setFastestInterval(16) // 16ms = 60fps
@@ -95,76 +96,80 @@ public class MainActivity extends FragmentActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		mNav = new SimpleSideDrawer(this);
+        mNav.setLeftBehindContentView(R.layout.activity_behind_left_simple);
+        findViewById(R.id.leftBtn).setOnClickListener(new OnClickListener() {
+            @Override 
+            public void onClick(View v) {
+                mNav.toggleLeftDrawer();
+            }
+        });
 
 		fragmentManager = getSupportFragmentManager();
 		fragment = (SupportMapFragment) fragmentManager
 				.findFragmentById(R.id.fragmentMap);
 
-		// GoogleMap�̃C���X�^���X�擾
+		// GoogleMapのインスタンス取得
 		map = fragment.getMap();
-		// �\���ʒu�i�����w�j�̐���
+		// 表示位置（東京駅）の生成
 		LatLng posMapPoint = new LatLng(35.681382, 139.766084);
-		// �����w��\��
+		// 東京駅を表示
 		builder = new CameraPosition.Builder();
-		// �s���̐ݒ�
+		// ピンの設定
 		options = new MarkerOptions();
 
-		// ���ݒn�擾������
-		map.setMyLocationEnabled(true);
-		// ���ݒn�{�^���^�b�`�C�x���g���擾����
-		map.setOnMyLocationButtonClickListener(this);
-		// Location
-		// Service���g�p���邽�߁ALocationClient�N���X�̃C���X�^���X�𐶐�����
-		mLocationClient = new LocationClient(getApplicationContext(), this, // ConnectionCallbacks
-				this); // OnConnectionFailedListener
+		// 現在地取得を許可
+	    map.setMyLocationEnabled(true);
+	    // 現在地ボタンタッチイベントを取得する
+	    map.setOnMyLocationButtonClickListener(this);
+	    // Location Serviceを使用するため、LocationClientクラスのインスタンスを生成する
+        mLocationClient = new LocationClient(
+                getApplicationContext(),
+                this,  // ConnectionCallbacks
+                this); // OnConnectionFailedListener
 
 		MapsInitializer.initialize(this);
 
-		// �����w��\��
-		builder.target(posMapPoint); // �J�����̕\���ʒu�̎w��
-		builder.zoom(13.0f); // �J�����̃Y�[�����x���̎w��
-		builder.bearing(0); // �J�����̌����̎w��
-		builder.tilt(25.0f); // �J�����̌X���̎w��
+		// 東京駅を表示
+		builder.target(posMapPoint);	// カメラの表示位置の指定
+		builder.zoom(13.0f);	// カメラのズームレベルの指定
+		builder.bearing(0);		// カメラの向きの指定
+		builder.tilt(25.0f);	// カメラの傾きの指定
 		map.moveCamera(CameraUpdateFactory.newCameraPosition(builder.build()));
 
-		// �s����̏�񂪃N���b�N���ꂽ���̃C�x���g����
-		// map.setOnInfoWindowClickListener(new
-		// GoogleMap.OnInfoWindowClickListener() {
-		// @Override
-		// public void onInfoWindowClick(Marker marker) {
-		// Toast.makeText(getApplicationContext(), "�����w���N���b�N����܂����B",
-		// Toast.LENGTH_SHORT).show();
-		// }
-		// });
+		// ピン上の情報がクリックされた時のイベント処理
+		//		map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+		//			@Override
+		//			public void onInfoWindowClick(Marker marker) {
+		//				Toast.makeText(getApplicationContext(), "東京駅がクリックされました。", Toast.LENGTH_SHORT).show();
+		//			}
+		//		});
 
-		// �}�b�v��̃N���b�N�C�x���g����
+		// マップ上のクリックイベント処理
 		map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 			@Override
-			public void onMapClick(LatLng point) {
-				Toast.makeText(
-						getApplicationContext(),
-						"�N���b�N���ꂽ���W�� " + point.latitude + ", "
-								+ point.longitude, Toast.LENGTH_SHORT).show();
-				// 3�̃}�[�J�[���\������Ă���΃}�[�J�[�𐶐����Ȃ�
+		    public void onMapClick(LatLng point) {
+		        Toast.makeText(getApplicationContext(),
+		        		"クリックされた座標は " + point.latitude + ", " + point.longitude, Toast.LENGTH_SHORT).show();
+				// 3�ｿｽﾂのマ�ｿｽ[�ｿｽJ�ｿｽ[�ｿｽ�ｿｽ�ｿｽ\�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽﾄゑｿｽ�ｿｽ�ｿｽﾎマ�ｿｽ[�ｿｽJ�ｿｽ[�ｿｽｶ撰ｿｽ�ｿｽ�ｿｽ�ｿｽﾈゑｿｽ
 
 				if (mflg < 3) {
 					pointarray[mflg] = point;
-					// �\���ʒu�i�^�b�v���ꂽ���W�j�̐���
+					// �ｿｽ\�ｿｽ�ｿｽ�ｿｽﾊ置�ｿｽi�ｿｽ^�ｿｽb�ｿｽv�ｿｽ�ｿｽ�ｿｽ黷ｽ�ｿｽ�ｿｽ�ｿｽW�ｿｽj�ｿｽﾌ撰ｿｽ�ｿｽ�ｿｽ
 					options.position(new LatLng(pointarray[mflg].latitude,
 							pointarray[mflg].longitude));
-					// �s���̃^�C�g���ݒ�
-					options.title("�}�[�J�[" + mflg + "���W�� "
-							+ pointarray[mflg].latitude + ", "
-							+ pointarray[mflg].longitude);
-					// �s���̐F�̐ݒ�
+					// �ｿｽs�ｿｽ�ｿｽ�ｿｽﾌタ�ｿｽC�ｿｽg�ｿｽ�ｿｽ�ｿｽﾝ抵ｿｽ
+					options.title("マーカー"+mflg+"座標は " + point.latitude + ", " + point.longitude);
+					// �ｿｽs�ｿｽ�ｿｽ�ｿｽﾌ色�ｿｽﾌ設抵ｿｽ
 					BitmapDescriptor icon = BitmapDescriptorFactory
 							.defaultMarker(BitmapDescriptorFactory.HUE_BLUE);
 					options.icon(icon);
-					// �s���̒ǉ�
+					// �ｿｽs�ｿｽ�ｿｽ�ｿｽﾌ追会ｿｽ
 					marker[mflg] = map.addMarker(options);
-					// �s���𒷉����Ńh���b�O�\��
+					// �ｿｽs�ｿｽ�ｿｽ�ｿｽｷ会ｿｽ�ｿｽ�ｿｽ�ｿｽﾅド�ｿｽ�ｿｽ�ｿｽb�ｿｽO�ｿｽﾂ能�ｿｽ�ｿｽ
 					marker[mflg].setDraggable(true);
-					// �s�����̃J�E���g��ǉ�
+					// �ｿｽs�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽﾌカ�ｿｽE�ｿｽ�ｿｽ�ｿｽg�ｿｽ�ｿｽﾇ会ｿｽ
 					mflg++;
 				}
 				if (mflg >= 3) {
@@ -182,14 +187,14 @@ public class MainActivity extends FragmentActivity implements
 			@Override
 			public void onMarkerDrag(Marker marker2) {
 				// TODO Auto-generated method stub
-				// Toast.makeText(getApplicationContext(), "マーカードラッグ中",
+				// Toast.makeText(getApplicationContext(), "繝槭�ｼ繧ｫ繝ｼ繝峨Λ繝�繧ｰ荳ｭ",
 				// Toast.LENGTH_SHORT).show();
 				if (mflg >= 3) {
-					// ドラッグ後マーカー座標取得
+					// 繝峨Λ繝�繧ｰ蠕後�槭�ｼ繧ｫ繝ｼ蠎ｧ讓吝叙蠕�
 					pointarray[0] = marker[0].getPosition();
 					pointarray[1] = marker[1].getPosition();
 					pointarray[2] = marker[2].getPosition();
-					// 前の円を削除し再描画
+					// 蜑阪�ｮ蜀�繧貞炎髯､縺怜�肴緒逕ｻ
 					circle.remove();
 					makeCircle();
 				}
@@ -200,7 +205,7 @@ public class MainActivity extends FragmentActivity implements
 			public void onMarkerDragEnd(Marker marker2) {
 
 				// TODO Auto-generated method stub
-				// Toast.makeText(getApplicationContext(), "マーカードラッグ終了",
+				// Toast.makeText(getApplicationContext(), "繝槭�ｼ繧ｫ繝ｼ繝峨Λ繝�繧ｰ邨ゆｺ�",
 				// Toast.LENGTH_LONG).show();
 			}
 
@@ -208,75 +213,79 @@ public class MainActivity extends FragmentActivity implements
 			public void onMarkerDragStart(Marker marker2) {
 
 				// TODO Auto-generated method stub
-				// Toast.makeText(getApplicationContext(), "マーカードラッグ開始",
+				// Toast.makeText(getApplicationContext(), "繝槭�ｼ繧ｫ繝ｼ繝峨Λ繝�繧ｰ髢句ｧ�",
 				// Toast.LENGTH_LONG).show();
 			}
 		});
 
-		// �}�b�v��̒������C�x���g����
-		map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-			@Override
-			public void onMapLongClick(LatLng point) {
+		// マップ上の長押しイベント処理
+				map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+				    @Override
+				    public void onMapLongClick(LatLng point) {
+				    	
+				    	CircleOptions circleOptions = new CircleOptions()
+				        .center(new LatLng(point.latitude,point.longitude))
+				        .radius(1000); 
+				    	map.addCircle(circleOptions);
+				    	
+				    	Toast.makeText(getApplicationContext(),
+				        		"長押しされた座標は " + point.latitude + ", " + point.longitude, Toast.LENGTH_SHORT).show();
+				    }
+				});
 
-				Toast.makeText(
-						getApplicationContext(),
-						"���������ꂽ���W�� " + point.latitude + ", "
-								+ point.longitude, Toast.LENGTH_SHORT).show();
-			}
-		});
-
-		// --------------------------------------------------------------------------------------------
-		// �X�s�i�[�̐ݒ�
-		/**
-		 * �����{�b�N�X��p�ӂ���i�A�N�V�����o�[�H�j
-		 * ����Ȃѓ���API�ɃL�[���[�h�ƃs���̍��W�������n��
-		 */
-
-		String[] items = { "������", "�J�t�F", "�ό�" };
-
-		Spinner spinnerGenre = (Spinner) findViewById(R.id.spinnerGenre);
-		// �A�_�v�^�ɃA�C�e����ǉ�
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_spinner_item, items);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		// �A�_�v�^�̐ݒ�
-		spinnerGenre.setAdapter(adapter);
-		// �X�s�i�[�̃^�C�g���ݒ�
-		spinnerGenre.setPrompt("�W�������̑I��");
-		// �|�W�V�����̎w��
-		spinnerGenre.setSelection(0);
-
-		spinnerGenre
-				.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+				//--------------------------------------------------------------------------------------------
+//				スピナーの設定
+				/**
+				 * 検索ボックスを用意する（アクションバー？）
+				 * ぐるなび等のAPIにキーワードとピンの座標を引き渡す
+				 */
+				
+				String[] items = {"居酒屋", "カフェ", "観光"};
+				
+				Spinner spinnerGenre = (Spinner) findViewById(R.id.spinnerGenre);
+				// アダプタにアイテムを追加
+				ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+						this,
+						android.R.layout.simple_spinner_item,
+						items);
+				adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+				// アダプタの設定
+				spinnerGenre.setAdapter(adapter);
+				// スピナーのタイトル設定
+				spinnerGenre.setPrompt("ジャンルの選択");
+				// ポジションの指定
+				spinnerGenre.setSelection(0);
+				
+				spinnerGenre.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 					@Override
-					public void onItemSelected(AdapterView<?> parent,
-							View view, int position, long id) {
+					public void onItemSelected(AdapterView<?> parent, View view,
+							int position, long id) {
 						Spinner spnGenre = (Spinner) parent;
 						item = (String) spnGenre.getItemAtPosition(position);
 
-						// Toast.makeText(getApplicationContext(),"�I�����ꂽ�A�C�e���� "
-						// + item, Toast.LENGTH_SHORT).show();
+//				    	Toast.makeText(getApplicationContext(),"選択されたアイテムは " + item, Toast.LENGTH_SHORT).show();
 					}
-
 					@Override
 					public void onNothingSelected(AdapterView<?> parent) {
 					}
 				});
 
-		// --------------------------------------------------------------------------------------------
-		// ���̑�
-		/**
-		 * �G���A�ݒ�̃��Z�b�g
-		 * 
-		 */
+				//--------------------------------------------------------------------------------------------
+//				その他
+				/**
+				 * エリア設定のリセット
+				 * 
+				 */
+				
+				
 
 	}
 
-	// 三点の外接円描画
+	// 荳臥せ縺ｮ螟匁磁蜀�謠冗判
 	public void makeCircle() {
 
 		double tmp[] = new double[6];
-		// 外心を計算。理屈は未検証・・・
+		// 螟門ｿ�繧定ｨ育ｮ励�ら炊螻医�ｯ譛ｪ讀懆ｨｼ繝ｻ繝ｻ繝ｻ
 		tmp[0] = 2 * (pointarray[1].longitude - pointarray[0].longitude);
 		tmp[1] = 2 * (pointarray[1].latitude - pointarray[0].latitude);
 		tmp[2] = Math.pow(pointarray[0].longitude, 2)
@@ -289,34 +298,34 @@ public class MainActivity extends FragmentActivity implements
 				- Math.pow(pointarray[2].longitude, 2)
 				+ Math.pow(pointarray[0].latitude, 2)
 				- Math.pow(pointarray[2].latitude, 2);
-		// 外心のx座標＝longitude
+		// 螟門ｿ�縺ｮx蠎ｧ讓呻ｼ挈ongitude
 		oX = ((tmp[1] * tmp[5]) - (tmp[4] * tmp[2]))
 				/ ((tmp[0] * tmp[4]) - (tmp[3] * tmp[1]));
-		// 外心のy座標＝latitude
+		// 螟門ｿ�縺ｮy蠎ｧ讓呻ｼ挈atitude
 		oY = ((tmp[2] * tmp[3]) - (tmp[5] * tmp[0]))
 				/ ((tmp[0] * tmp[4]) - (tmp[3] * tmp[1]));
 
 		// double dx = Math.pow(oX - pointarray[0].longitude / 0.0091, 2);
 		// double dy = Math.pow(oY - pointarray[0].latitude /0.0111, 2);
 
-		// 外心の半径を計算　
-		double r = 6378.137; // 赤道半径[km]
-		// 外心
+		// 螟門ｿ�縺ｮ蜊雁ｾ�繧定ｨ育ｮ励��
+		double r = 6378.137; // 襍､驕灘濠蠕Ъkm]
+		// 螟門ｿ�
 		double dy1 = oY * PI / 180;
 		double dx1 = oX * PI / 180;
-		// 1個目のマーカー
+		// 1蛟狗岼縺ｮ繝槭�ｼ繧ｫ繝ｼ
 		double my1 = pointarray[0].latitude * PI / 180;
 		double mx1 = pointarray[0].longitude * PI / 180;
-		// 外心とマーカーの距離[m]
+		// 螟門ｿ�縺ｨ繝槭�ｼ繧ｫ繝ｼ縺ｮ霍晞屬[m]
 		double dist = r
 				* acos(sin(dy1) * sin(my1) + cos(dy1) * cos(my1)
 						* cos(mx1 - dx1)) * 1000;
 
 		distance = (int) dist;
 
-		Log.d("外心のx座標", "" + oX);
-		Log.d("外心のy座標", "" + oY);
-		Log.d("半径", "" + distance);
+		Log.d("螟門ｿ�縺ｮx蠎ｧ讓�", "" + oX);
+		Log.d("螟門ｿ�縺ｮy蠎ｧ讓�", "" + oY);
+		Log.d("蜊雁ｾ�", "" + distance);
 
 		CircleOptions circleOptions = new CircleOptions()
 				.center(new LatLng(oY, oX)).radius(distance)
@@ -400,8 +409,7 @@ public class MainActivity extends FragmentActivity implements
 				// for (int i = 0 ; i < 3 ; i++){
 				// currentPoint[i] = marker[i].getPosition();
 				// }
-				new MyAsyncTask(map, latitude, longitude, distance, item)
-						.execute(query);
+				new MyAsyncTask(map, latitude, longitude, distance, item).execute(query);
 				// }else{
 				// Toast.makeText(getApplicationContext(),
 				// "�����͈͂̎w�肪�s�����Ă��܂��B3�_�Ŏw�肵�Ă��������B",
