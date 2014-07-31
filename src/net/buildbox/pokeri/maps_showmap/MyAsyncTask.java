@@ -24,13 +24,13 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 	String genre;
 	Marker marker = null;
 	WebApi webApi = null;
-	// double oY = 0; //�ｿｽO�ｿｽS�ｿｽ�ｿｽlat
-	// double oX = 0; //�ｿｽO�ｿｽS�ｿｽ�ｿｽlng
+	// double oY = 0; //外心のlat
+	// double oX = 0; //外信のlng
 	double latitude = 0;
 	double longitude = 0;
-	double distance = 0; // �ｿｽO�ｿｽﾚ円�ｿｽﾌ費ｿｽ�ｿｽa
+	double distance = 0; // 外接円の半径
 
-	// �ｿｽR�ｿｽ�ｿｽ�ｿｽX�ｿｽg�ｿｽ�ｿｽ�ｿｽN�ｿｽ^�ｿｽﾅ�ｿｽ�ｿｽC�ｿｽ�ｿｽ�ｿｽX�ｿｽ�ｿｽ�ｿｽb�ｿｽh�ｿｽ�ｿｽmap�ｿｽ�ｿｽ�ｿｽｯ趣ｿｽ�ｿｽ
+	// コンストラクタでメインスレッド（MainActivity.java）のmapや外心座標等を受け取る
 
 	public MyAsyncTask(GoogleMap map2, double latitude2, double longitude2,
 			int distance2, String item2) {
@@ -48,17 +48,14 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 
 		// ---------------------------------------------------------------------------------------------
 
-		// ---------------------------------------------------------------------------------------------
-
-		// �ｿｽg�ｿｽp�ｿｽ�ｿｽ�ｿｽ�ｿｽWebAPI�ｿｽﾌ費ｿｽ�ｿｽ�ｿｽ
+		// 使用するWebApiの判定
 		if (genre.equals("居酒屋")) {
 			webApi = new Api_Gnavi();
 		} else if (genre.equals("観光")) {
-			// �ｿｽ�ｿｽ�ｿｽ�ｿｽAPI�ｿｽﾌイ�ｿｽ�ｿｽ�ｿｽX�ｿｽ^�ｿｽ�ｿｽ�ｿｽX�ｿｽ�ｿｽﾏ撰ｿｽ�ｿｽ�ｿｽ�ｿｽuwebApi�ｿｽv�ｿｽﾅ作成�ｿｽ�ｿｽ�ｿｽ�ｿｽ
 			webApi = new Api_YahooLocalSearch();
 		}
 
-		// �ｿｽe�ｿｽ�ｿｽAPI�ｿｽﾖの鯉ｿｽ�ｿｽ�ｿｽ�ｿｽN�ｿｽG�ｿｽ�ｿｽ�ｿｽﾆなゑｿｽURL�ｿｽ�ｿｽ�ｿｽ�成
+		// 各種APIへの検索クエリとなるURLを作成
 		Log.d("createUrl","params[0]="+params[0]+"lat="+String.valueOf(latitude)+"lng="+String.valueOf(longitude));
 		String queryUrl = webApi.createUrl(params[0], String.valueOf(latitude),String.valueOf(longitude));
 
@@ -69,18 +66,18 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 		String result = "";
 
 		try {
-			// URL�ｿｽ�ｿｽHTTP�ｿｽﾚ托ｿｽ
+			// URLにHTTP接続
 			url = new URL(queryUrl);
 			http = (HttpURLConnection) url.openConnection();
 			http.setRequestMethod("GET");
 			http.connect();
-			// InputStream�ｿｽ^�ｿｽﾏ撰ｿｽin�ｿｽﾉデ�ｿｽ[�ｿｽ^�ｿｽ�ｿｽ�ｿｽ_�ｿｽE�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ[�ｿｽh
+			// InputStream型変数inにデータをダウンロード
 			in = http.getInputStream();
 
-			// �ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽﾊゑｿｽxml�ｿｽ�ｿｽ�ｿｽ�ｿｽK�ｿｽv�ｿｽﾈパ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ[�ｿｽ^�ｿｽ�ｿｽﾘゑｿｽo�ｿｽ�ｿｽ
+			// 検索結果のxmlから必要なパラメータを切り出す
 			result = webApi.getResult(in);
 
-			// �ｿｽ謫ｾ�ｿｽ�ｿｽ�ｿｽ�ｿｽxml�ｿｽe�ｿｽL�ｿｽX�ｿｽg�ｿｽ�ｿｽonPostExcecute�ｿｽﾉ茨ｿｽ�ｿｽ�ｿｽ�ｿｽn�ｿｽ�ｿｽ
+			// 取得したxmlテキストをonPostExcecuteに引き渡す
 			return result;
 
 		} catch (Exception e) {
@@ -104,22 +101,22 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 		// marker[m].remove();
 		// m++;
 		// }
-		// �ｿｽ}�ｿｽ[�ｿｽJ�ｿｽ[�ｿｽﾌオ�ｿｽv�ｿｽV�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽp�ｿｽC�ｿｽ�ｿｽ�ｿｽX�ｿｽ^�ｿｽ�ｿｽ�ｿｽX
+		// マーカーのオプション用インスタンス
 		MarkerOptions options = new MarkerOptions();
 
-		// 1�ｿｽX�ｿｽ�ｿｽ1�ｿｽs�ｿｽﾌ形�ｿｽﾅ切ゑｿｽo�ｿｽ�ｿｽ�ｿｽﾄ配�ｿｽ�ｿｽﾉ格�ｿｽ[
+		// 1店舗1行の形で切り出して配列に格納
 		String[] strAry = src.split("\n");
 
 		for (int i = 0; i < strAry.length; i++) {
 
-			// 1�ｿｽX�ｿｽﾜの各�ｿｽp�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ[�ｿｽ^�ｿｽ�ｿｽﾘゑｿｽo�ｿｽ�ｿｽ�ｿｽﾄ配�ｿｽ�ｿｽﾉ格�ｿｽ[
+			// 1店舗の各パラメータを切り出して配列に格納
 			String[] strAry2 = strAry[i].split(",");
 			for (int j = 0; j < strAry2.length; j++) {
 			}
 
-			// API�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽlat,lng�ｿｽﾌ擾ｿｽ�ｿｽﾔゑｿｽ�ｿｽ痰､�ｿｽﾌで、�ｿｽ�ｿｽ�ｿｽﾌ対会ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ
-			// API�ｿｽ�ｿｽ�ｿｽﾌ切ゑｿｽo�ｿｽ�ｿｽ�ｿｽ^�ｿｽ�ｿｽAPI�ｿｽN�ｿｽ�ｿｽ�ｿｽX�ｿｽﾌ抵ｿｽ�ｿｽﾉ難ｿｽ�ｿｽ�ｿｽ�ｿｽﾗゑｿｽ�ｿｽ�ｿｽ�ｿｽB
-			// �ｿｽ�ｿｽ�ｿｽW�ｿｽﾌ値�ｿｽ�ｿｽString�ｿｽ�ｿｽ�ｿｽ�ｿｽDouble�ｿｽﾉ型�ｿｽﾏ奇ｿｽ
+			//API次第でlat,lngの順番が違うので、その対応も入れる
+			//API毎の切り出し型もAPIクラスの中に入れるべきか。
+			//座標の値をStringからDoubleに型変換
 
 			double lat = 0;
 			double lng = 0;
@@ -136,12 +133,11 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 					lng = Double.parseDouble(strAry2[2]);// lat
 				}
 			} catch (ClassNotFoundException e) {
-				// TODO �ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ黷ｽ catch �ｿｽu�ｿｽ�ｿｽ�ｿｽb�ｿｽN
 				e.printStackTrace();
 			}
 
-			// �ｿｽ�ｿｽ�ｿｽW�ｿｽ�ｿｽ�ｿｽO�ｿｽﾚ円�ｿｽﾌ範囲難ｿｽ�ｿｽ�ｿｽ�ｿｽﾇゑｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ
-			// �ｿｽO�ｿｽS�ｿｽﾆ店�ｿｽﾌ具ｿｽ�ｿｽ�ｿｽ
+			//座標が外接円の範囲内かどうか判定
+	        //外心と店の距離
 			double r = 6378.137; // 襍､驕灘濠蠕Ъkm]
 			// 蠎励�ｮ蠎ｧ讓�
 			double dy1 = lat * PI / 180;
@@ -154,18 +150,18 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 					* acos(sin(dy1) * sin(my1) + cos(dy1) * cos(my1)
 							* cos(mx1 - dx1)) * 1000;
 
-			// �ｿｽO�ｿｽS�ｿｽﾆ店�ｿｽﾌ具ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽa�ｿｽﾈ難ｿｽ�ｿｽﾅゑｿｽ�ｿｽ�ｿｽﾎ外�ｿｽﾚ円�ｿｽﾌ難ｿｽ�ｿｽ�ｿｽ�ｿｽB�ｿｽ�ｿｽ�ｿｽa�ｿｽﾈ擾ｿｽﾈゑｿｽO�ｿｽ�ｿｽ�ｿｽB
+			// 外心と店の距離が半径以内であれば外接円の内部。半径以上なら外部。
 			if (distance2 <= distance) {
 
-				// �ｿｽ\�ｿｽ�ｿｽ�ｿｽﾊ置�ｿｽｶ撰ｿｽ
-				// �ｿｽﾉ端�ｿｽﾉ搾ｿｽ�ｿｽW�ｿｽ�ｿｽ�ｿｽﾟゑｿｽ�ｿｽ鼾�ｿｽﾍ後か�ｿｽ逅ｶ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ黷ｽ�ｿｽs�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽﾌピ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ繽托ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ轤ｵ�ｿｽ�ｿｽ�ｿｽB�ｿｽu�ｿｽ謔ｩ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽv�ｿｽﾅ鯉ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽﾆわか�ｿｽ�ｿｽB
+				// 表示位置を生成
+				// 極端に座標が近い場合は後から生成されたピンが既存のピンを上書きするらしい。「よかたい」で検索するとわかる。
 				LatLng posMapPoint = new LatLng(lat, lng);
 
-				// �ｿｽs�ｿｽ�ｿｽ�ｿｽﾆタ�ｿｽC�ｿｽg�ｿｽ�ｿｽ�ｿｽi�ｿｽX�ｿｽ�ｿｽ�ｿｽj�ｿｽﾌ設抵ｿｽ
+				// ピンとタイトル（店名）の設定
 				options.position(posMapPoint);
 				options.title(strAry2[1]);
-				// �ｿｽs�ｿｽ�ｿｽ�ｿｽﾌ�
 
+				// ピンを地図上に追加
 				// marker[m] = map.addMarker(options);
 				marker = map.addMarker(options);
 				// m++;
