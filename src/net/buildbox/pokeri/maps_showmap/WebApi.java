@@ -3,6 +3,6 @@ package net.buildbox.pokeri.maps_showmap;
 import java.io.InputStream;
 
 public abstract class WebApi {
-	abstract String createUrl(String query, String lat, String lng); //ŒŸõƒL[ƒ[ƒh‚Æ‘I‘ğ”ÍˆÍ‚ÌŠOSÀ•W‚ğ“n‚·
+	abstract String createUrl(String query, String lat, String lng); //æ¤œç´¢ã‚­ãƒ¼ãƒ¯ãƒ¼ãƒ‰ã¨é¸æŠç¯„å›²ã®å¤–å¿ƒåº§æ¨™ã‚’æ¸¡ã™
 	abstract String getResult(InputStream xml); 
 }

@@ -17,49 +17,47 @@ public class XmlParse {
 		String result = "";
 		boolean idFlg = false;
 		
-	//----------------------------------------------------------------------------------------------
-	//tag[0]`[x]‚Åó‚¯æ‚Á‚½ƒ^ƒO‚ğxml‚Ì’†‚©‚ç’T‚µA‚P“X•Ü‚Ps‚ÌƒJƒ“ƒ}‹æØ‚èƒeƒLƒXƒg‚É®Œ`‚·‚é
+		//tag[0]ã€œ[x]ã§å—ã‘å–ã£ãŸã‚¿ã‚°ã‚’xmlã®ä¸­ã‹ã‚‰æ¢ã—ã€ï¼‘åº—èˆ—ï¼‘è¡Œã®ã‚«ãƒ³ãƒåŒºåˆ‡ã‚Šãƒ†ã‚­ã‚¹ãƒˆã«æ•´å½¢ã™ã‚‹
 		
-		//XmlPullParser‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğ“¾‚é
+		//XmlPullParserã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ç”Ÿæˆ
 		final XmlPullParser xmlPullParser = Xml.newPullParser();
 		
-	    	//xmlƒf[ƒ^‚ğxmlPullParser‚Éˆø‚«“n‚·
+	    	//xmlãƒ‡ãƒ¼ã‚¿ã‚’xmlPullParserã«å¼•ãæ¸¡ã™
 	    	try {
 				xmlPullParser.setInput(xml,null);
 			} catch (XmlPullParserException e1) {
 				Log.d("XmlPullParser", "setinput error");
 			}
 
-	    	//xmlƒ^ƒO‚ÌƒXƒe[ƒ^ƒXiEND_DOCUMENT“™j‚ğeventType‚ÉŠi”[‚·‚é
+	    	//xmlã‚¿ã‚°ã®ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹ï¼ˆEND_DOCUMENTç­‰ï¼‰ã‚’eventTypeã«æ ¼ç´ã™ã‚‹
 			int eventType = 0;
 			try {
 				eventType = xmlPullParser.getEventType();
 			} catch (XmlPullParserException e1) {
-				// TODO ©“®¶¬‚³‚ê‚½ catch ƒuƒƒbƒN
 				e1.printStackTrace();
 			}
 			
         while (eventType != XmlPullParser.END_DOCUMENT) {
 
         	try {
-        		//ŠJnƒ^ƒO‚¾‚Á‚½ê‡A’Šoˆ—‚ğs‚¤
+        		//é–‹å§‹ã‚¿ã‚°ã ã£ãŸå ´åˆã€æŠ½å‡ºå‡¦ç†ã‚’è¡Œã†
 	        	if(eventType == XmlPullParser.START_TAG) {
 	        		
 	        		tagName = xmlPullParser.getName();
 	        		
 	        		if (tagName.equals(idTag)){
 	        			result += xmlPullParser.nextText() + ",";
-	        			idFlg = true; //©“¯‚¶–¼‘O‚Ìƒ^ƒO‚ÍÅ‰‚Éo‚Ä‚«‚½‚à‚Ì‚µ‚©E‚í‚È‚¢‚æ‚¤‚É‚·‚éˆ’u
+	        			idFlg = true; //â†åŒã˜åå‰ã®ã‚¿ã‚°ã¯æœ€åˆã«å‡ºã¦ããŸã‚‚ã®ã—ã‹æ‹¾ã‚ãªã„ã‚ˆã†ã«ã™ã‚‹ãŸã‚ã®ä»•æ›ã‘
 	        		}
 	        		
-	        		//’Šo‘ÎÛƒ^ƒO‚Ì’†g‚ğresult‚ÉƒJƒ“ƒ}‹æØ‚è‚Å’Ç‹L‚·‚é
+	        		//æŠ½å‡ºå¯¾è±¡ã‚¿ã‚°ã®ä¸­èº«ã‚’resultã«ã‚«ãƒ³ãƒåŒºåˆ‡ã‚Šã§è¿½è¨˜ã™ã‚‹
 	        		if (idFlg){
 		        		for (int i = 0 ; i < tag.length ; i++){
 		        			if (tagName.equals(tag[i])){
 			        			result += xmlPullParser.nextText() + ",";
 			        		}
 		        		}
-		        		//’Šo‘ÎÛ‚ÌÅŒã”öƒ^ƒO‚ğˆ—‚µ‚½ê‡AÅŒã‚É‰üs‚ğ’Ç‹L‚·‚é
+		        		//æŠ½å‡ºå¯¾è±¡ã®æœ€å¾Œå°¾ã‚¿ã‚°ã‚’å‡¦ç†ã—ãŸå ´åˆã€æœ€å¾Œã«æ”¹è¡Œã‚’è¿½è¨˜ã™ã‚‹
 		        		if (tagName.equals(tag[tag.length -1])){ 
 		        			result +="\n";
 		        			idFlg = false;
@@ -71,7 +69,7 @@ public class XmlParse {
             }
         	
         	try {
-        		//Ÿ‚Ìƒ^ƒO‚ğ“Ç‚İ‚Ş
+        		//æ¬¡ã®ã‚¿ã‚°ã‚’èª­ã¿è¾¼ã‚€
         		eventType = xmlPullParser.next();
         	}catch (Exception e) {
         		Log.d("xmlPullParser", "ParseError2");
