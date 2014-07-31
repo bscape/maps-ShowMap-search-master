@@ -85,7 +85,7 @@ public class MainActivity extends FragmentActivity implements
 	 * 検索した場所にピンを立てる
 	 */
     
-    // 現在地の取得を許可する。位置情報の更新頻度・精度を設定する。
+    // 位置情報の更新頻度・精度を設定する。
 	private static final LocationRequest REQUEST = LocationRequest.create()
 			.setInterval(5000) // 5 seconds
 			.setFastestInterval(16) // 16ms = 60fps
@@ -151,24 +151,24 @@ public class MainActivity extends FragmentActivity implements
 		    public void onMapClick(LatLng point) {
 		        Toast.makeText(getApplicationContext(),
 		        		"クリックされた座標は " + point.latitude + ", " + point.longitude, Toast.LENGTH_SHORT).show();
-				// 3�ｿｽﾂのマ�ｿｽ[�ｿｽJ�ｿｽ[�ｿｽ�ｿｽ�ｿｽ\�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽﾄゑｿｽ�ｿｽ�ｿｽﾎマ�ｿｽ[�ｿｽJ�ｿｽ[�ｿｽｶ撰ｿｽ�ｿｽ�ｿｽ�ｿｽﾈゑｿｽ
+		    	// 3つのマーカーが表示されていればマーカーを生成しない
 
 				if (mflg < 3) {
 					pointarray[mflg] = point;
-					// �ｿｽ\�ｿｽ�ｿｽ�ｿｽﾊ置�ｿｽi�ｿｽ^�ｿｽb�ｿｽv�ｿｽ�ｿｽ�ｿｽ黷ｽ�ｿｽ�ｿｽ�ｿｽW�ｿｽj�ｿｽﾌ撰ｿｽ�ｿｽ�ｿｽ
+					// 表示位置（タップされた座標）の取得
 					options.position(new LatLng(pointarray[mflg].latitude,
 							pointarray[mflg].longitude));
-					// �ｿｽs�ｿｽ�ｿｽ�ｿｽﾌタ�ｿｽC�ｿｽg�ｿｽ�ｿｽ�ｿｽﾝ抵ｿｽ
+					// ピンのタイトルを設定
 					options.title("マーカー"+mflg+"座標は " + point.latitude + ", " + point.longitude);
-					// �ｿｽs�ｿｽ�ｿｽ�ｿｽﾌ色�ｿｽﾌ設抵ｿｽ
+					// ピンの色を設定
 					BitmapDescriptor icon = BitmapDescriptorFactory
 							.defaultMarker(BitmapDescriptorFactory.HUE_BLUE);
 					options.icon(icon);
-					// �ｿｽs�ｿｽ�ｿｽ�ｿｽﾌ追会ｿｽ
+					// ピンを地図上に追加
 					marker[mflg] = map.addMarker(options);
-					// �ｿｽs�ｿｽ�ｿｽ�ｿｽｷ会ｿｽ�ｿｽ�ｿｽ�ｿｽﾅド�ｿｽ�ｿｽ�ｿｽb�ｿｽO�ｿｽﾂ能�ｿｽ�ｿｽ
+					// ピンをドラッグ可能にする
 					marker[mflg].setDraggable(true);
-					// �ｿｽs�ｿｽ�ｿｽ�ｿｽ�ｿｽ�ｿｽﾌカ�ｿｽE�ｿｽ�ｿｽ�ｿｽg�ｿｽ�ｿｽﾇ会ｿｽ
+					// ピン数のカウントを追加
 					mflg++;
 				}
 				if (mflg >= 3) {
@@ -185,9 +185,6 @@ public class MainActivity extends FragmentActivity implements
 		map.setOnMarkerDragListener(new OnMarkerDragListener() {
 			@Override
 			public void onMarkerDrag(Marker marker2) {
-				// TODO Auto-generated method stub
-				// Toast.makeText(getApplicationContext(), "繝槭�ｼ繧ｫ繝ｼ繝峨Λ繝�繧ｰ荳ｭ",
-				// Toast.LENGTH_SHORT).show();
 				if (mflg >= 3) {
 					// 繝峨Λ繝�繧ｰ蠕後�槭�ｼ繧ｫ繝ｼ蠎ｧ讓吝叙蠕�
 					pointarray[0] = marker[0].getPosition();
@@ -197,23 +194,16 @@ public class MainActivity extends FragmentActivity implements
 					circle.remove();
 					makeCircle();
 				}
-
 			}
 
 			@Override
 			public void onMarkerDragEnd(Marker marker2) {
-
-				// TODO Auto-generated method stub
-				// Toast.makeText(getApplicationContext(), "繝槭�ｼ繧ｫ繝ｼ繝峨Λ繝�繧ｰ邨ゆｺ�",
-				// Toast.LENGTH_LONG).show();
+				// ドラッグ終了のリスナー。今回は何もしない。
 			}
 
 			@Override
 			public void onMarkerDragStart(Marker marker2) {
-
-				// TODO Auto-generated method stub
-				// Toast.makeText(getApplicationContext(), "繝槭�ｼ繧ｫ繝ｼ繝峨Λ繝�繧ｰ髢句ｧ�",
-				// Toast.LENGTH_LONG).show();
+				// ドラッグ開始のリスナー。今回は何もしない。
 			}
 		});
 
@@ -273,18 +263,14 @@ public class MainActivity extends FragmentActivity implements
 //				その他
 				/**
 				 * エリア設定のリセット
-				 * 
 				 */
-				
-				
-
 	}
 
-	// 荳臥せ縺ｮ螟匁磁蜀�謠冗判
+	// 地図上の選択範囲に円を重ねる
 	public void makeCircle() {
 
 		double tmp[] = new double[6];
-		// 螟門ｿ�繧定ｨ育ｮ励�ら炊螻医�ｯ譛ｪ讀懆ｨｼ繝ｻ繝ｻ繝ｻ
+		// 選択した３点を頂点とする三角形の外心を求める
 		tmp[0] = 2 * (pointarray[1].longitude - pointarray[0].longitude);
 		tmp[1] = 2 * (pointarray[1].latitude - pointarray[0].latitude);
 		tmp[2] = Math.pow(pointarray[0].longitude, 2)
@@ -297,10 +283,10 @@ public class MainActivity extends FragmentActivity implements
 				- Math.pow(pointarray[2].longitude, 2)
 				+ Math.pow(pointarray[0].latitude, 2)
 				- Math.pow(pointarray[2].latitude, 2);
-		// 螟門ｿ�縺ｮx蠎ｧ讓呻ｼ挈ongitude
+		// 外心のX座標＝longitude＝経度
 		oX = ((tmp[1] * tmp[5]) - (tmp[4] * tmp[2]))
 				/ ((tmp[0] * tmp[4]) - (tmp[3] * tmp[1]));
-		// 螟門ｿ�縺ｮy蠎ｧ讓呻ｼ挈atitude
+		// 外心のY座標＝latitude＝緯度
 		oY = ((tmp[2] * tmp[3]) - (tmp[5] * tmp[0]))
 				/ ((tmp[0] * tmp[4]) - (tmp[3] * tmp[1]));
 
@@ -332,8 +318,6 @@ public class MainActivity extends FragmentActivity implements
 				.fillColor(Color.argb(80, 200, 0, 255));
 		circle = map.addCircle(circleOptions);
 	};
-
-	// Implementation of {@link LocationListener}.
 
 	@Override
 	public void onLocationChanged(Location location) {
@@ -372,55 +356,57 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	// --------------------------------------------------------------------------------------------
-	// �A�N�V�����o�[�̌����{�b�N�X
+	// アクションバーの検索ボックス
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
 
-		// SearchView���Ăяo��
+		// SearchViewを呼び出す
 		final MenuItem searchMenu = menu.findItem(R.id.menu_search);
 		final SearchView searchView = (SearchView) searchMenu.getActionView();
 
-		// �����A�C�R���������{�b�N�X�̓����ɔz�u
+		// 検索アイコンを検索ボックスの内側に配置
 		searchView.setIconifiedByDefault(false);
 
-		// �����J�n�{�^����\��
+		// 検索開始ボタンを表示
 		searchView.setSubmitButtonEnabled(true);
 
-		// �������������͂����ۂ⌟�����s���ɌĂ΂�郊�X�i�[��ݒ�
+		// 検索文字列を入力した際や、検索実行時に呼ばれる各種リスナーを設定
 		searchView.setOnQueryTextListener(new OnQueryTextListener() {
 			@Override
 			public boolean onQueryTextSubmit(String query) {
-				// �A�N�V�����o�[���擾
+				// アクションバーを取得
 				ActionBar actionBar = getActionBar();
-				// �}�[�J�[�̍��W�i�[�p�ϐ�
+				// 外心の緯度・経度
 				double latitude = oY;
 				double longitude = oX;
 
-				// �����L�[���[�h���^�C�g���ɐݒ�
+				// 検索キーワードをタイトルに設定
 				actionBar.setTitle(query);
 
-				// �����L�[���[�h�����W�Ƌ���WebApi�ֈ����n���iposMapPoint�͔z��^�B4�_�܂Ƃ߂ēn���Ă���j
-				// 3�_���ݒ肳��Ă��Ȃ��ꍇ�̓��b�Z�[�W��\������
+				// 検索キーワードを座標と共にWebApiへ引き渡す
+				// ３点が設定されていない場合はメッセージを表示する
 				// if (mflg == 3) {
-				// 3�_�̌��ݍ��W���i�[����
+				// ３点の現在座標を格納する
 				// for (int i = 0 ; i < 3 ; i++){
 				// currentPoint[i] = marker[i].getPosition();
 				// }
+				
+				// MyAsyncTaskクラスに座標・キーワードを引き渡し、検索を実行する
 				new MyAsyncTask(map, latitude, longitude, distance, item).execute(query);
 				// }else{
 				// Toast.makeText(getApplicationContext(),
-				// "�����͈͂̎w�肪�s�����Ă��܂��B3�_�Ŏw�肵�Ă��������B",
+				// "検索範囲の指定が不足しています。3点で指定してください。",
 				// Toast.LENGTH_SHORT).show();
 				// }
 
-				// �f�t�H���g�ŕ\�������\�t�g�E�F�A�L�[�{�[�h���\��
+				// デフォルトで表示されるソフトウェアキーボードを非表示にする
 				InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 				inputMethodManager.hideSoftInputFromWindow(
 						searchView.getWindowToken(), 0);
 
-				// �����{�b�N�X�����
+				// 検索ボックスを閉じる
 				searchMenu.collapseActionView();
 
 				return false;
@@ -428,7 +414,7 @@ public class MainActivity extends FragmentActivity implements
 
 			@Override
 			public boolean onQueryTextChange(String newText) {
-				// �����{�b�N�X�̓��e���ύX���ꂽ�ۂɎ��s
+				// 検索ボックスの内容が変更された際に実行
 				return false;
 			}
 		});
