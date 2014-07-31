@@ -111,7 +111,7 @@ public class MainActivity extends FragmentActivity implements
 
 		// GoogleMapのインスタンス取得
 		map = fragment.getMap();
-		// 表示位置（東京駅）の生成
+		// 初期表示位置（東京駅）の生成
 		LatLng posMapPoint = new LatLng(35.681382, 139.766084);
 		// 東京駅を表示
 		builder = new CameraPosition.Builder();
@@ -136,14 +136,6 @@ public class MainActivity extends FragmentActivity implements
 		builder.bearing(0);		// カメラの向きの指定
 		builder.tilt(25.0f);	// カメラの傾きの指定
 		map.moveCamera(CameraUpdateFactory.newCameraPosition(builder.build()));
-
-		// ピン上の情報がクリックされた時のイベント処理
-		//		map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-		//			@Override
-		//			public void onInfoWindowClick(Marker marker) {
-		//				Toast.makeText(getApplicationContext(), "東京駅がクリックされました。", Toast.LENGTH_SHORT).show();
-		//			}
-		//		});
 
 		// マップ上のクリックイベント処理
 		map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
@@ -177,7 +169,6 @@ public class MainActivity extends FragmentActivity implements
 						makeCircle();
 						cflg = cflg + 1;
 					}
-
 				}
 			}
 		});
@@ -223,14 +214,13 @@ public class MainActivity extends FragmentActivity implements
 				});
 
 				//--------------------------------------------------------------------------------------------
-//				スピナーの設定
 				/**
-				 * 検索ボックスを用意する（アクションバー？）
+				 * 検索ボックスを用意する
 				 * ぐるなび等のAPIにキーワードとピンの座標を引き渡す
 				 */
-				
+
+				// スピナーの設定
 				String[] items = {"居酒屋", "カフェ", "観光"};
-				
 				Spinner spinnerGenre = (Spinner) findViewById(R.id.spinnerGenre);
 				// アダプタにアイテムを追加
 				ArrayAdapter<String> adapter = new ArrayAdapter<String>(
@@ -324,22 +314,17 @@ public class MainActivity extends FragmentActivity implements
 		// Do nothing
 	}
 
-	// Callback called when connected to GCore. Implementation of {@link
-	// ConnectionCallbacks}.
 	@Override
 	public void onConnected(Bundle connectionHint) {
 		mLocationClient.requestLocationUpdates(REQUEST, this); // this =
 																// LocationListener
 	}
 
-	// Callback called when disconnected from GCore. Implementation of {@link
-	// ConnectionCallbacks}.
 	@Override
 	public void onDisconnected() {
 		// Do nothing
 	}
 
-	// Implementation of {@link OnConnectionFailedListener}.
 	@Override
 	public void onConnectionFailed(ConnectionResult result) {
 		// Do nothing
@@ -349,9 +334,6 @@ public class MainActivity extends FragmentActivity implements
 	public boolean onMyLocationButtonClick() {
 		Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT)
 				.show();
-		// Return false so that we don't consume the event and the default
-		// behavior still occurs
-		// (the camera animates to the user's current position).
 		return false;
 	}
 
