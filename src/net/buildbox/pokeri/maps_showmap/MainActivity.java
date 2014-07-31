@@ -79,14 +79,13 @@ public class MainActivity extends FragmentActivity implements
 	//--------------------------------------------------------------------------------------------
 	//	マップ関連の処理
 	/**
-	 * 4つのピンを立てる
+	 * ３つのピンを立てる
 	 * ピンを立てて囲った範囲の色を変える
 	 * ぐるなび等のAPIと連携して検索する
 	 * 検索した場所にピンを立てる
 	 */
     
-    // These settings are the same as the settings for the map. They will in fact give you updates
-    // at the maximal rates currently possible.
+    // 現在地の取得を許可する。位置情報の更新頻度・精度を設定する。
 	private static final LocationRequest REQUEST = LocationRequest.create()
 			.setInterval(5000) // 5 seconds
 			.setFastestInterval(16) // 16ms = 60fps
