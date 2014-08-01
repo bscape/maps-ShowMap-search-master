@@ -13,19 +13,19 @@ public class Api_YahooLocalSearch extends WebApi {
 
 		String queryUrl = "http://search.olp.yahooapis.jp/OpenLocalPlatform/V1/localSearch";
         String apiKey = "dj0zaiZpPTF4b21pU1duRVpIUyZzPWNvbnN1bWVyc2VjcmV0Jng9Yjc-";
-        String qPage = "50"; //一度のリクエストで得るレスポンス件数の最大値
+        String qPage = "50"; //��x�̃��N�G�X�g�œ��郌�X�|���X�����̍ő�l
         String keyword = null;;
         String qLat = lat;
         String qLng = lng;
-        String range = "50"; //半径50kmの結果を取得
+        String range = "50"; //���a50km�̌��ʂ��擾
         
-        //検索キーワードをUTF-8でURLエンコーディングする（API側の要請に基づく）
+        //�����L�[���[�h��UTF-8��URL�G���R�[�f�B���O����iAPI���̗v���Ɋ�Â��j
         try {
         	keyword = URLEncoder.encode(query, "utf-8");
         }catch (UnsupportedEncodingException e){
         	//do nothing
         }
-        // 検索クエリとなるURLを作成
+        // �����N�G���ƂȂ�URL���쐬
     	queryUrl += "?appid="+apiKey+"&results="+qPage+"&query=" + keyword + "&dist=" + range + "&lat=" + qLat + "&lon=" + qLng;
     	Log.d("YahooApi", "url="+queryUrl);
     	
@@ -37,10 +37,10 @@ public class Api_YahooLocalSearch extends WebApi {
 	String getResult(InputStream xml) {
 		String result;
 		
-		//検索結果のxmlテキストを、１店舗１行のカンマ区切りテキストに整形する
-		//引数１：xmlテキスト　引数２以降：抽出したいタグ名（ただし記載する順番はxmlテキスト中に記述される順番と一致させる必要がある）
-		//一度に多量のタグを抽出しようとすると、取得結果が途中で途切れる（メモリ不足のため？）
-		//DLしたデータは一旦ファイルに書き出したほうが良い？
+		//�������ʂ�xml�e�L�X�g���A�P�X�܂P�s�̃J���}��؂�e�L�X�g�ɐ��`����
+		//�����P�Fxml�e�L�X�g�@�����Q�ȍ~�F���o�������^�O���i�������L�ڂ��鏇�Ԃ�xml�e�L�X�g���ɋL�q����鏇�Ԃƈ�v������K�v������j
+		//��x�ɑ��ʂ̃^�O�𒊏o���悤�Ƃ���ƁA�擾���ʂ��r���œr�؂��i�������s���̂��߁H�j
+		//DL�����f�[�^�͈�U�t�@�C���ɏ����o�����ق����ǂ��H
 		result = new XmlParse().execute(xml,"Gid","Name","Coordinates"); 
 		Log.d("YahooApi", "result="+result);
 		

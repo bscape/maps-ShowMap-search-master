@@ -6,7 +6,6 @@ import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -24,13 +23,13 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 	String genre;
 	Marker marker = null;
 	WebApi webApi = null;
-	// double oY = 0; //å¤–å¿ƒã®lat
-	// double oX = 0; //å¤–ä¿¡ã®lng
+	// double oY = 0; //ŠOS‚Ìlat
+	// double oX = 0; //ŠOM‚Ìlng
 	double latitude = 0;
 	double longitude = 0;
-	double distance = 0; // å¤–æ¥å††ã®åŠå¾„
+	double distance = 0; // ŠOÚ‰~‚Ì”¼Œa
 
-	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã§ãƒ¡ã‚¤ãƒ³ã‚¹ãƒ¬ãƒƒãƒ‰ï¼ˆMainActivity.javaï¼‰ã®mapã‚„å¤–å¿ƒåº§æ¨™ç­‰ã‚’å—ã‘å–ã‚‹
+	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^‚ÅƒƒCƒ“ƒXƒŒƒbƒhiMainActivity.javaj‚Ìmap‚âŠOSÀ•W“™‚ğó‚¯æ‚é
 
 	public MyAsyncTask(GoogleMap map2, double latitude2, double longitude2,
 			int distance2, String item2) {
@@ -40,7 +39,7 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 		longitude = longitude2;
 		distance = distance2;
 		genre = item2;
-		// TODO é–¾ï½ªèœæ…•å‡½è¬ŒèˆŒï¼†ç¹§å¾Œâ—†ç¹§ï½³ç¹ï½³ç¹§ï½¹ç¹åŒ»Î›ç¹§ï½¯ç¹§ï½¿ç¹ï½¼ç¹ï½»ç¹§ï½¹ç¹§ï½¿ç¹ï¿½
+		// TODO è‡ªå‹•ç”Ÿæˆã•ã‚ŒãŸã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ãƒ¼ãƒ»ã‚¹ã‚¿ãƒ?
 	}
 
 	@Override
@@ -48,14 +47,14 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 
 		// ---------------------------------------------------------------------------------------------
 
-		// ä½¿ç”¨ã™ã‚‹WebApiã®åˆ¤å®š
-		if (genre.equals("å±…é…’å±‹")) {
+		// g—p‚·‚éWebApi‚Ì”»’è
+		if (genre.equals("‹ğ‰®")) {
 			webApi = new Api_Gnavi();
-		} else if (genre.equals("è¦³å…‰")) {
+		} else if (genre.equals("ŠÏŒõ")) {
 			webApi = new Api_YahooLocalSearch();
 		}
 
-		// å„ç¨®APIã¸ã®æ¤œç´¢ã‚¯ã‚¨ãƒªã¨ãªã‚‹URLã‚’ä½œæˆ
+		// ŠeíAPI‚Ö‚ÌŒŸõƒNƒGƒŠ‚Æ‚È‚éURL‚ğì¬
 		Log.d("createUrl","params[0]="+params[0]+"lat="+String.valueOf(latitude)+"lng="+String.valueOf(longitude));
 		String queryUrl = webApi.createUrl(params[0], String.valueOf(latitude),String.valueOf(longitude));
 
@@ -66,18 +65,18 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 		String result = "";
 
 		try {
-			// URLã«HTTPæ¥ç¶š
+			// URL‚ÉHTTPÚ‘±
 			url = new URL(queryUrl);
 			http = (HttpURLConnection) url.openConnection();
 			http.setRequestMethod("GET");
 			http.connect();
-			// InputStreamå‹å¤‰æ•°inã«ãƒ‡ãƒ¼ã‚¿ã‚’ãƒ€ã‚¦ãƒ³ãƒ­ãƒ¼ãƒ‰
+			// InputStreamŒ^•Ï”in‚Éƒf[ƒ^‚ğƒ_ƒEƒ“ƒ[ƒh
 			in = http.getInputStream();
 
-			// æ¤œç´¢çµæœã®xmlã‹ã‚‰å¿…è¦ãªãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’åˆ‡ã‚Šå‡ºã™
+			// ŒŸõŒ‹‰Ê‚Ìxml‚©‚ç•K—v‚Èƒpƒ‰ƒ[ƒ^‚ğØ‚èo‚·
 			result = webApi.getResult(in);
 
-			// å–å¾—ã—ãŸxmlãƒ†ã‚­ã‚¹ãƒˆã‚’onPostExcecuteã«å¼•ãæ¸¡ã™
+			// æ“¾‚µ‚½xmlƒeƒLƒXƒg‚ğonPostExcecute‚Éˆø‚«“n‚·
 			return result;
 
 		} catch (Exception e) {
@@ -96,27 +95,27 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 	// @Override
 	protected void onPostExecute(String src) {
 
-		int m = 0;
+		// int m = 0;
 		// if(marker[m] != null){
 		// marker[m].remove();
 		// m++;
 		// }
-		// ãƒãƒ¼ã‚«ãƒ¼ã®ã‚ªãƒ—ã‚·ãƒ§ãƒ³ç”¨ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
+		// ƒ}[ƒJ[‚ÌƒIƒvƒVƒ‡ƒ“—pƒCƒ“ƒXƒ^ƒ“ƒX
 		MarkerOptions options = new MarkerOptions();
 
-		// 1åº—èˆ—1è¡Œã®å½¢ã§åˆ‡ã‚Šå‡ºã—ã¦é…åˆ—ã«æ ¼ç´
+		// 1“X•Ü1s‚ÌŒ`‚ÅØ‚èo‚µ‚Ä”z—ñ‚ÉŠi”[
 		String[] strAry = src.split("\n");
 
 		for (int i = 0; i < strAry.length; i++) {
 
-			// 1åº—èˆ—ã®å„ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’åˆ‡ã‚Šå‡ºã—ã¦é…åˆ—ã«æ ¼ç´
+			// 1“X•Ü‚ÌŠeƒpƒ‰ƒ[ƒ^‚ğØ‚èo‚µ‚Ä”z—ñ‚ÉŠi”[
 			String[] strAry2 = strAry[i].split(",");
 			for (int j = 0; j < strAry2.length; j++) {
 			}
 
-			//APIæ¬¡ç¬¬ã§lat,lngã®é †ç•ªãŒé•ã†ã®ã§ã€ãã®å¯¾å¿œã‚‚å…¥ã‚Œã‚‹
-			//APIæ¯ã®åˆ‡ã‚Šå‡ºã—å‹ã‚‚APIã‚¯ãƒ©ã‚¹ã®ä¸­ã«å…¥ã‚Œã‚‹ã¹ãã‹ã€‚
-			//åº§æ¨™ã®å€¤ã‚’Stringã‹ã‚‰Doubleã«å‹å¤‰æ›
+			//APIŸ‘æ‚Ålat,lng‚Ì‡”Ô‚ªˆá‚¤‚Ì‚ÅA‚»‚Ì‘Î‰‚à“ü‚ê‚é
+			//API–ˆ‚ÌØ‚èo‚µŒ^‚àAPIƒNƒ‰ƒX‚Ì’†‚É“ü‚ê‚é‚×‚«‚©B
+			//À•W‚Ì’l‚ğString‚©‚çDouble‚ÉŒ^•ÏŠ·
 
 			double lat = 0;
 			double lng = 0;
@@ -136,32 +135,32 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 				e.printStackTrace();
 			}
 
-			//åº§æ¨™ãŒå¤–æ¥å††ã®ç¯„å›²å†…ã‹ã©ã†ã‹åˆ¤å®š
-	        //å¤–å¿ƒã¨åº—ã®è·é›¢
-			double r = 6378.137; // è¥ï½¤é©•ç˜æ¿ è •Ğªkm]
-			// è åŠ±ï¿½ï½®è ï½§è®“ï¿½
+			//À•W‚ªŠOÚ‰~‚Ì”ÍˆÍ“à‚©‚Ç‚¤‚©”»’è
+	        //ŠOS‚Æ“X‚Ì‹——£
+			double r = 6378.137; // èµ¤é“åŠå¾„[km]
+			// åº—ã?®åº§æ¨?
 			double dy1 = lat * PI / 180;
 			double dx1 = lng * PI / 180;
-			// èŸé–€ï½¿ï¿½ç¸ºï½®è ï½§è®“ï¿½
+			// å¤–å¿?ã®åº§æ¨?
 			double my1 = latitude * PI / 180;
 			double mx1 = longitude * PI / 180;
-			// èŸé–€ï½¿ï¿½ç¸ºï½¨è åŠ±ï¿½ï½®éœæ™å±¬[m]
+			// å¤–å¿?ã¨åº—ã?®è·é›¢[m]
 			double distance2 = r
 					* acos(sin(dy1) * sin(my1) + cos(dy1) * cos(my1)
 							* cos(mx1 - dx1)) * 1000;
 
-			// å¤–å¿ƒã¨åº—ã®è·é›¢ãŒåŠå¾„ä»¥å†…ã§ã‚ã‚Œã°å¤–æ¥å††ã®å†…éƒ¨ã€‚åŠå¾„ä»¥ä¸Šãªã‚‰å¤–éƒ¨ã€‚
+			// ŠOS‚Æ“X‚Ì‹——£‚ª”¼ŒaˆÈ“à‚Å‚ ‚ê‚ÎŠOÚ‰~‚Ì“à•”B”¼ŒaˆÈã‚È‚çŠO•”B
 			if (distance2 <= distance) {
 
-				// è¡¨ç¤ºä½ç½®ã‚’ç”Ÿæˆ
-				// æ¥µç«¯ã«åº§æ¨™ãŒè¿‘ã„å ´åˆã¯å¾Œã‹ã‚‰ç”Ÿæˆã•ã‚ŒãŸãƒ”ãƒ³ãŒæ—¢å­˜ã®ãƒ”ãƒ³ã‚’ä¸Šæ›¸ãã™ã‚‹ã‚‰ã—ã„ã€‚ã€Œã‚ˆã‹ãŸã„ã€ã§æ¤œç´¢ã™ã‚‹ã¨ã‚ã‹ã‚‹ã€‚
+				// •\¦ˆÊ’u‚ğ¶¬
+				// ‹É’[‚ÉÀ•W‚ª‹ß‚¢ê‡‚ÍŒã‚©‚ç¶¬‚³‚ê‚½ƒsƒ“‚ªŠù‘¶‚Ìƒsƒ“‚ğã‘‚«‚·‚é‚ç‚µ‚¢Bu‚æ‚©‚½‚¢v‚ÅŒŸõ‚·‚é‚Æ‚í‚©‚éB
 				LatLng posMapPoint = new LatLng(lat, lng);
 
-				// ãƒ”ãƒ³ã¨ã‚¿ã‚¤ãƒˆãƒ«ï¼ˆåº—åï¼‰ã®è¨­å®š
+				// ƒsƒ“‚Æƒ^ƒCƒgƒ‹i“X–¼j‚Ìİ’è
 				options.position(posMapPoint);
 				options.title(strAry2[1]);
 
-				// ãƒ”ãƒ³ã‚’åœ°å›³ä¸Šã«è¿½åŠ 
+				// ƒsƒ“‚ğ’n}ã‚É’Ç‰Á
 				// marker[m] = map.addMarker(options);
 				marker = map.addMarker(options);
 				// m++;

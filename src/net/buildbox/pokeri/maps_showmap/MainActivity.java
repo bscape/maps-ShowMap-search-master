@@ -31,7 +31,7 @@ import android.widget.SearchView.OnQueryTextListener;
 import android.graphics.Color;
 
 //--------------------------------------------------------------------------------------------	
-//ç¾åœ¨åœ°è¡¨ç¤ºé–¢é€£
+//Œ»İ’n•\¦ŠÖ˜A
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
@@ -54,7 +54,7 @@ public class MainActivity extends FragmentActivity implements
 		OnMyLocationButtonClickListener {
 
 	//--------------------------------------------------------------------------------------------	
-	//	ã‚¯ãƒ©ã‚¹å†…å…±ç”¨å¤‰æ•°ã®ä½œæˆ
+	//	ƒNƒ‰ƒX“à‹¤—p•Ï”‚Ìì¬
 
 	private FragmentManager fragmentManager;
 	private SupportMapFragment fragment;
@@ -70,22 +70,22 @@ public class MainActivity extends FragmentActivity implements
 	
 	private SimpleSideDrawer mNav;
 
-	double oY = 0; // ï¿½ï½¿ï½½Oï¿½ï½¿ï½½Sï¿½ï½¿ï½½ï¿½ï½¿ï½½lat
-	double oX = 0; // ï¿½ï½¿ï½½Oï¿½ï½¿ï½½Sï¿½ï½¿ï½½ï¿½ï½¿ï½½lng
-	int distance = 0; // ï¿½ï½¿ï½½Oï¿½ï½¿ï½½ï¾šå††ï¿½ï½¿ï½½ï¾Œè²»ï½¿ï½½ï¿½ï½¿ï½½a
+	double oY = 0; // ?¿½O?¿½S?¿½?¿½lat
+	double oX = 0; // ?¿½O?¿½S?¿½?¿½lng
+	int distance = 0; // ?¿½O?¿½Ú‰~?¿½Ì”ï¿½?¿½a
 
 	private LocationClient mLocationClient;
 
 	//--------------------------------------------------------------------------------------------
-	//	ãƒãƒƒãƒ—é–¢é€£ã®å‡¦ç†
+	//	ƒ}ƒbƒvŠÖ˜A‚Ìˆ—
 	/**
-	 * ï¼“ã¤ã®ãƒ”ãƒ³ã‚’ç«‹ã¦ã‚‹
-	 * ãƒ”ãƒ³ã‚’ç«‹ã¦ã¦å›²ã£ãŸç¯„å›²ã®è‰²ã‚’å¤‰ãˆã‚‹
-	 * ãã‚‹ãªã³ç­‰ã®APIã¨é€£æºã—ã¦æ¤œç´¢ã™ã‚‹
-	 * æ¤œç´¢ã—ãŸå ´æ‰€ã«ãƒ”ãƒ³ã‚’ç«‹ã¦ã‚‹
+	 * ‚R‚Â‚Ìƒsƒ“‚ğ—§‚Ä‚é
+	 * ƒsƒ“‚ğ—§‚Ä‚ÄˆÍ‚Á‚½”ÍˆÍ‚ÌF‚ğ•Ï‚¦‚é
+	 * ‚®‚é‚È‚Ñ“™‚ÌAPI‚Æ˜AŒg‚µ‚ÄŒŸõ‚·‚é
+	 * ŒŸõ‚µ‚½êŠ‚Éƒsƒ“‚ğ—§‚Ä‚é
 	 */
     
-    // ä½ç½®æƒ…å ±ã®æ›´æ–°é »åº¦ãƒ»ç²¾åº¦ã‚’è¨­å®šã™ã‚‹ã€‚
+    // ˆÊ’uî•ñ‚ÌXV•p“xE¸“x‚ğİ’è‚·‚éB
 	private static final LocationRequest REQUEST = LocationRequest.create()
 			.setInterval(5000) // 5 seconds
 			.setFastestInterval(16) // 16ms = 60fps
@@ -109,20 +109,20 @@ public class MainActivity extends FragmentActivity implements
 		fragment = (SupportMapFragment) fragmentManager
 				.findFragmentById(R.id.fragmentMap);
 
-		// GoogleMapã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹å–å¾—
+		// GoogleMap‚ÌƒCƒ“ƒXƒ^ƒ“ƒXæ“¾
 		map = fragment.getMap();
-		// åˆæœŸè¡¨ç¤ºä½ç½®ï¼ˆæ±äº¬é§…ï¼‰ã®ç”Ÿæˆ
+		// ‰Šú•\¦ˆÊ’ui“Œ‹‰wj‚Ì¶¬
 		LatLng posMapPoint = new LatLng(35.681382, 139.766084);
-		// æ±äº¬é§…ã‚’è¡¨ç¤º
+		// “Œ‹‰w‚ğ•\¦
 		builder = new CameraPosition.Builder();
-		// ãƒ”ãƒ³ã®è¨­å®š
+		// ƒsƒ“‚Ìİ’è
 		options = new MarkerOptions();
 
-		// ç¾åœ¨åœ°å–å¾—ã‚’è¨±å¯
+		// Œ»İ’næ“¾‚ğ‹–‰Â
 	    map.setMyLocationEnabled(true);
-	    // ç¾åœ¨åœ°ãƒœã‚¿ãƒ³ã‚¿ãƒƒãƒã‚¤ãƒ™ãƒ³ãƒˆã‚’å–å¾—ã™ã‚‹
+	    // Œ»İ’nƒ{ƒ^ƒ“ƒ^ƒbƒ`ƒCƒxƒ“ƒg‚ğæ“¾‚·‚é
 	    map.setOnMyLocationButtonClickListener(this);
-	    // Location Serviceã‚’ä½¿ç”¨ã™ã‚‹ãŸã‚ã€LocationClientã‚¯ãƒ©ã‚¹ã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ç”Ÿæˆã™ã‚‹
+	    // Location Service‚ğg—p‚·‚é‚½‚ßALocationClientƒNƒ‰ƒX‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğ¶¬‚·‚é
         mLocationClient = new LocationClient(
                 getApplicationContext(),
                 this,  // ConnectionCallbacks
@@ -130,37 +130,37 @@ public class MainActivity extends FragmentActivity implements
 
 		MapsInitializer.initialize(this);
 
-		// æ±äº¬é§…ã‚’è¡¨ç¤º
-		builder.target(posMapPoint);	// ã‚«ãƒ¡ãƒ©ã®è¡¨ç¤ºä½ç½®ã®æŒ‡å®š
-		builder.zoom(13.0f);	// ã‚«ãƒ¡ãƒ©ã®ã‚ºãƒ¼ãƒ ãƒ¬ãƒ™ãƒ«ã®æŒ‡å®š
-		builder.bearing(0);		// ã‚«ãƒ¡ãƒ©ã®å‘ãã®æŒ‡å®š
-		builder.tilt(25.0f);	// ã‚«ãƒ¡ãƒ©ã®å‚¾ãã®æŒ‡å®š
+		// “Œ‹‰w‚ğ•\¦
+		builder.target(posMapPoint);	// ƒJƒƒ‰‚Ì•\¦ˆÊ’u‚Ìw’è
+		builder.zoom(13.0f);	// ƒJƒƒ‰‚ÌƒY[ƒ€ƒŒƒxƒ‹‚Ìw’è
+		builder.bearing(0);		// ƒJƒƒ‰‚ÌŒü‚«‚Ìw’è
+		builder.tilt(25.0f);	// ƒJƒƒ‰‚ÌŒX‚«‚Ìw’è
 		map.moveCamera(CameraUpdateFactory.newCameraPosition(builder.build()));
 
-		// ãƒãƒƒãƒ—ä¸Šã®ã‚¯ãƒªãƒƒã‚¯ã‚¤ãƒ™ãƒ³ãƒˆå‡¦ç†
+		// ƒ}ƒbƒvã‚ÌƒNƒŠƒbƒNƒCƒxƒ“ƒgˆ—
 		map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 			@Override
 		    public void onMapClick(LatLng point) {
 		        Toast.makeText(getApplicationContext(),
-		        		"ã‚¯ãƒªãƒƒã‚¯ã•ã‚ŒãŸåº§æ¨™ã¯ " + point.latitude + ", " + point.longitude, Toast.LENGTH_SHORT).show();
-		    	// 3ã¤ã®ãƒãƒ¼ã‚«ãƒ¼ãŒè¡¨ç¤ºã•ã‚Œã¦ã„ã‚Œã°ãƒãƒ¼ã‚«ãƒ¼ã‚’ç”Ÿæˆã—ãªã„
+		        		"ƒNƒŠƒbƒN‚³‚ê‚½À•W‚Í " + point.latitude + ", " + point.longitude, Toast.LENGTH_SHORT).show();
+		    	// 3‚Â‚Ìƒ}[ƒJ[‚ª•\¦‚³‚ê‚Ä‚¢‚ê‚Îƒ}[ƒJ[‚ğ¶¬‚µ‚È‚¢
 
 				if (mflg < 3) {
 					pointarray[mflg] = point;
-					// è¡¨ç¤ºä½ç½®ï¼ˆã‚¿ãƒƒãƒ—ã•ã‚ŒãŸåº§æ¨™ï¼‰ã®å–å¾—
+					// •\¦ˆÊ’uiƒ^ƒbƒv‚³‚ê‚½À•Wj‚Ìæ“¾
 					options.position(new LatLng(pointarray[mflg].latitude,
 							pointarray[mflg].longitude));
-					// ãƒ”ãƒ³ã®ã‚¿ã‚¤ãƒˆãƒ«ã‚’è¨­å®š
-					options.title("ãƒãƒ¼ã‚«ãƒ¼"+mflg+"åº§æ¨™ã¯ " + point.latitude + ", " + point.longitude);
-					// ãƒ”ãƒ³ã®è‰²ã‚’è¨­å®š
+					// ƒsƒ“‚Ìƒ^ƒCƒgƒ‹‚ğİ’è
+					options.title("ƒ}[ƒJ["+mflg+"À•W‚Í " + point.latitude + ", " + point.longitude);
+					// ƒsƒ“‚ÌF‚ğİ’è
 					BitmapDescriptor icon = BitmapDescriptorFactory
 							.defaultMarker(BitmapDescriptorFactory.HUE_BLUE);
 					options.icon(icon);
-					// ãƒ”ãƒ³ã‚’åœ°å›³ä¸Šã«è¿½åŠ 
+					// ƒsƒ“‚ğ’n}ã‚É’Ç‰Á
 					marker[mflg] = map.addMarker(options);
-					// ãƒ”ãƒ³ã‚’ãƒ‰ãƒ©ãƒƒã‚°å¯èƒ½ã«ã™ã‚‹
+					// ƒsƒ“‚ğƒhƒ‰ƒbƒO‰Â”\‚É‚·‚é
 					marker[mflg].setDraggable(true);
-					// ãƒ”ãƒ³æ•°ã®ã‚«ã‚¦ãƒ³ãƒˆã‚’è¿½åŠ 
+					// ƒsƒ“”‚ÌƒJƒEƒ“ƒg‚ğ’Ç‰Á
 					mflg++;
 				}
 				if (mflg >= 3) {
@@ -177,11 +177,11 @@ public class MainActivity extends FragmentActivity implements
 			@Override
 			public void onMarkerDrag(Marker marker2) {
 				if (mflg >= 3) {
-					// ç¹å³¨Î›ç¹ï¿½ç¹§ï½°è •å¾Œï¿½æ§­ï¿½ï½¼ç¹§ï½«ç¹ï½¼è ï½§è®“åå™è •ï¿½
+					// ãƒ‰ãƒ©ãƒ?ã‚°å¾Œã?ã?¼ã‚«ãƒ¼åº§æ¨™å–å¾?
 					pointarray[0] = marker[0].getPosition();
 					pointarray[1] = marker[1].getPosition();
 					pointarray[2] = marker[2].getPosition();
-					// èœ‘é˜ªï¿½ï½®èœ€ï¿½ç¹§è²ç‚é«¯ï½¤ç¸ºæ€œï¿½è‚´ç·’é€•ï½»
+					// å‰ã?®å†?ã‚’å‰Šé™¤ã—å?æç”»
 					circle.remove();
 					makeCircle();
 				}
@@ -189,16 +189,16 @@ public class MainActivity extends FragmentActivity implements
 
 			@Override
 			public void onMarkerDragEnd(Marker marker2) {
-				// ãƒ‰ãƒ©ãƒƒã‚°çµ‚äº†ã®ãƒªã‚¹ãƒŠãƒ¼ã€‚ä»Šå›ã¯ä½•ã‚‚ã—ãªã„ã€‚
+				// ƒhƒ‰ƒbƒOI—¹‚ÌƒŠƒXƒi[B¡‰ñ‚Í‰½‚à‚µ‚È‚¢B
 			}
 
 			@Override
 			public void onMarkerDragStart(Marker marker2) {
-				// ãƒ‰ãƒ©ãƒƒã‚°é–‹å§‹ã®ãƒªã‚¹ãƒŠãƒ¼ã€‚ä»Šå›ã¯ä½•ã‚‚ã—ãªã„ã€‚
+				// ƒhƒ‰ƒbƒOŠJn‚ÌƒŠƒXƒi[B¡‰ñ‚Í‰½‚à‚µ‚È‚¢B
 			}
 		});
 
-		// ãƒãƒƒãƒ—ä¸Šã®é•·æŠ¼ã—ã‚¤ãƒ™ãƒ³ãƒˆå‡¦ç†
+		// ƒ}ƒbƒvã‚Ì’·‰Ÿ‚µƒCƒxƒ“ƒgˆ—
 				map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
 				    @Override
 				    public void onMapLongClick(LatLng point) {
@@ -209,30 +209,30 @@ public class MainActivity extends FragmentActivity implements
 				    	map.addCircle(circleOptions);
 				    	
 				    	Toast.makeText(getApplicationContext(),
-				        		"é•·æŠ¼ã—ã•ã‚ŒãŸåº§æ¨™ã¯ " + point.latitude + ", " + point.longitude, Toast.LENGTH_SHORT).show();
+				        		"’·‰Ÿ‚µ‚³‚ê‚½À•W‚Í " + point.latitude + ", " + point.longitude, Toast.LENGTH_SHORT).show();
 				    }
 				});
 
 				//--------------------------------------------------------------------------------------------
 				/**
-				 * æ¤œç´¢ãƒœãƒƒã‚¯ã‚¹ã‚’ç”¨æ„ã™ã‚‹
-				 * ãã‚‹ãªã³ç­‰ã®APIã«ã‚­ãƒ¼ãƒ¯ãƒ¼ãƒ‰ã¨ãƒ”ãƒ³ã®åº§æ¨™ã‚’å¼•ãæ¸¡ã™
+				 * ŒŸõƒ{ƒbƒNƒX‚ğ—pˆÓ‚·‚é
+				 * ‚®‚é‚È‚Ñ“™‚ÌAPI‚ÉƒL[ƒ[ƒh‚Æƒsƒ“‚ÌÀ•W‚ğˆø‚«“n‚·
 				 */
 
-				// ã‚¹ãƒ”ãƒŠãƒ¼ã®è¨­å®š
-				String[] items = {"å±…é…’å±‹", "ã‚«ãƒ•ã‚§", "è¦³å…‰"};
+				// ƒXƒsƒi[‚Ìİ’è
+				String[] items = {"‹ğ‰®", "ƒJƒtƒF", "ŠÏŒõ"};
 				Spinner spinnerGenre = (Spinner) findViewById(R.id.spinnerGenre);
-				// ã‚¢ãƒ€ãƒ—ã‚¿ã«ã‚¢ã‚¤ãƒ†ãƒ ã‚’è¿½åŠ 
+				// ƒAƒ_ƒvƒ^‚ÉƒAƒCƒeƒ€‚ğ’Ç‰Á
 				ArrayAdapter<String> adapter = new ArrayAdapter<String>(
 						this,
 						android.R.layout.simple_spinner_item,
 						items);
 				adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-				// ã‚¢ãƒ€ãƒ—ã‚¿ã®è¨­å®š
+				// ƒAƒ_ƒvƒ^‚Ìİ’è
 				spinnerGenre.setAdapter(adapter);
-				// ã‚¹ãƒ”ãƒŠãƒ¼ã®ã‚¿ã‚¤ãƒˆãƒ«è¨­å®š
-				spinnerGenre.setPrompt("ã‚¸ãƒ£ãƒ³ãƒ«ã®é¸æŠ");
-				// ãƒã‚¸ã‚·ãƒ§ãƒ³ã®æŒ‡å®š
+				// ƒXƒsƒi[‚Ìƒ^ƒCƒgƒ‹İ’è
+				spinnerGenre.setPrompt("ƒWƒƒƒ“ƒ‹‚Ì‘I‘ğ");
+				// ƒ|ƒWƒVƒ‡ƒ“‚Ìw’è
 				spinnerGenre.setSelection(0);
 				
 				spinnerGenre.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -242,7 +242,7 @@ public class MainActivity extends FragmentActivity implements
 						Spinner spnGenre = (Spinner) parent;
 						item = (String) spnGenre.getItemAtPosition(position);
 
-//				    	Toast.makeText(getApplicationContext(),"é¸æŠã•ã‚ŒãŸã‚¢ã‚¤ãƒ†ãƒ ã¯ " + item, Toast.LENGTH_SHORT).show();
+//				    	Toast.makeText(getApplicationContext(),"‘I‘ğ‚³‚ê‚½ƒAƒCƒeƒ€‚Í " + item, Toast.LENGTH_SHORT).show();
 					}
 					@Override
 					public void onNothingSelected(AdapterView<?> parent) {
@@ -250,17 +250,17 @@ public class MainActivity extends FragmentActivity implements
 				});
 
 				//--------------------------------------------------------------------------------------------
-//				ãã®ä»–
+//				‚»‚Ì‘¼
 				/**
-				 * ã‚¨ãƒªã‚¢è¨­å®šã®ãƒªã‚»ãƒƒãƒˆ
+				 * ƒGƒŠƒAİ’è‚ÌƒŠƒZƒbƒg
 				 */
 	}
 
-	// åœ°å›³ä¸Šã®é¸æŠç¯„å›²ã«å††ã‚’é‡ã­ã‚‹
+	// ’n}ã‚Ì‘I‘ğ”ÍˆÍ‚É‰~‚ğd‚Ë‚é
 	public void makeCircle() {
 
 		double tmp[] = new double[6];
-		// é¸æŠã—ãŸï¼“ç‚¹ã‚’é ‚ç‚¹ã¨ã™ã‚‹ä¸‰è§’å½¢ã®å¤–å¿ƒã‚’æ±‚ã‚ã‚‹
+		// ‘I‘ğ‚µ‚½‚R“_‚ğ’¸“_‚Æ‚·‚éOŠpŒ`‚ÌŠOS‚ğ‹‚ß‚é
 		tmp[0] = 2 * (pointarray[1].longitude - pointarray[0].longitude);
 		tmp[1] = 2 * (pointarray[1].latitude - pointarray[0].latitude);
 		tmp[2] = Math.pow(pointarray[0].longitude, 2)
@@ -273,34 +273,34 @@ public class MainActivity extends FragmentActivity implements
 				- Math.pow(pointarray[2].longitude, 2)
 				+ Math.pow(pointarray[0].latitude, 2)
 				- Math.pow(pointarray[2].latitude, 2);
-		// å¤–å¿ƒã®Xåº§æ¨™ï¼longitudeï¼çµŒåº¦
+		// ŠOS‚ÌXÀ•WlongitudeŒo“x
 		oX = ((tmp[1] * tmp[5]) - (tmp[4] * tmp[2]))
 				/ ((tmp[0] * tmp[4]) - (tmp[3] * tmp[1]));
-		// å¤–å¿ƒã®Yåº§æ¨™ï¼latitudeï¼ç·¯åº¦
+		// ŠOS‚ÌYÀ•WlatitudeˆÜ“x
 		oY = ((tmp[2] * tmp[3]) - (tmp[5] * tmp[0]))
 				/ ((tmp[0] * tmp[4]) - (tmp[3] * tmp[1]));
 
 		// double dx = Math.pow(oX - pointarray[0].longitude / 0.0091, 2);
 		// double dy = Math.pow(oY - pointarray[0].latitude /0.0111, 2);
 
-		// èŸé–€ï½¿ï¿½ç¸ºï½®èœŠé›ï½¾ï¿½ç¹§å®šï½¨è‚²ï½®åŠ±ï¿½ï¿½
-		double r = 6378.137; // è¥ï½¤é©•ç˜æ¿ è •Ğªkm]
-		// èŸé–€ï½¿ï¿½
+		// å¤–å¿?ã®åŠå¾?ã‚’è¨ˆç®—ã??
+		double r = 6378.137; // èµ¤é“åŠå¾„[km]
+		// å¤–å¿?
 		double dy1 = oY * PI / 180;
 		double dx1 = oX * PI / 180;
-		// 1è›Ÿç‹—å²¼ç¸ºï½®ç¹æ§­ï¿½ï½¼ç¹§ï½«ç¹ï½¼
+		// 1å€‹ç›®ã®ãƒã?¼ã‚«ãƒ¼
 		double my1 = pointarray[0].latitude * PI / 180;
 		double mx1 = pointarray[0].longitude * PI / 180;
-		// èŸé–€ï½¿ï¿½ç¸ºï½¨ç¹æ§­ï¿½ï½¼ç¹§ï½«ç¹ï½¼ç¸ºï½®éœæ™å±¬[m]
+		// å¤–å¿?ã¨ãƒã?¼ã‚«ãƒ¼ã®è·é›¢[m]
 		double dist = r
 				* acos(sin(dy1) * sin(my1) + cos(dy1) * cos(my1)
 						* cos(mx1 - dx1)) * 1000;
 
 		distance = (int) dist;
 
-		Log.d("èŸé–€ï½¿ï¿½ç¸ºï½®xè ï½§è®“ï¿½", "" + oX);
-		Log.d("èŸé–€ï½¿ï¿½ç¸ºï½®yè ï½§è®“ï¿½", "" + oY);
-		Log.d("èœŠé›ï½¾ï¿½", "" + distance);
+		Log.d("å¤–å¿?ã®xåº§æ¨?", "" + oX);
+		Log.d("å¤–å¿?ã®yåº§æ¨?", "" + oY);
+		Log.d("åŠå¾?", "" + distance);
 
 		CircleOptions circleOptions = new CircleOptions()
 				.center(new LatLng(oY, oX)).radius(distance)
@@ -338,57 +338,57 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	// --------------------------------------------------------------------------------------------
-	// ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ãƒãƒ¼ã®æ¤œç´¢ãƒœãƒƒã‚¯ã‚¹
+	// ƒAƒNƒVƒ‡ƒ“ƒo[‚ÌŒŸõƒ{ƒbƒNƒX
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
 
-		// SearchViewã‚’å‘¼ã³å‡ºã™
+		// SearchView‚ğŒÄ‚Ño‚·
 		final MenuItem searchMenu = menu.findItem(R.id.menu_search);
 		final SearchView searchView = (SearchView) searchMenu.getActionView();
 
-		// æ¤œç´¢ã‚¢ã‚¤ã‚³ãƒ³ã‚’æ¤œç´¢ãƒœãƒƒã‚¯ã‚¹ã®å†…å´ã«é…ç½®
+		// ŒŸõƒAƒCƒRƒ“‚ğŒŸõƒ{ƒbƒNƒX‚Ì“à‘¤‚É”z’u
 		searchView.setIconifiedByDefault(false);
 
-		// æ¤œç´¢é–‹å§‹ãƒœã‚¿ãƒ³ã‚’è¡¨ç¤º
+		// ŒŸõŠJnƒ{ƒ^ƒ“‚ğ•\¦
 		searchView.setSubmitButtonEnabled(true);
 
-		// æ¤œç´¢æ–‡å­—åˆ—ã‚’å…¥åŠ›ã—ãŸéš›ã‚„ã€æ¤œç´¢å®Ÿè¡Œæ™‚ã«å‘¼ã°ã‚Œã‚‹å„ç¨®ãƒªã‚¹ãƒŠãƒ¼ã‚’è¨­å®š
+		// ŒŸõ•¶š—ñ‚ğ“ü—Í‚µ‚½Û‚âAŒŸõÀs‚ÉŒÄ‚Î‚ê‚éŠeíƒŠƒXƒi[‚ğİ’è
 		searchView.setOnQueryTextListener(new OnQueryTextListener() {
 			@Override
 			public boolean onQueryTextSubmit(String query) {
-				// ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ãƒãƒ¼ã‚’å–å¾—
+				// ƒAƒNƒVƒ‡ƒ“ƒo[‚ğæ“¾
 				ActionBar actionBar = getActionBar();
-				// å¤–å¿ƒã®ç·¯åº¦ãƒ»çµŒåº¦
+				// ŠOS‚ÌˆÜ“xEŒo“x
 				double latitude = oY;
 				double longitude = oX;
 
-				// æ¤œç´¢ã‚­ãƒ¼ãƒ¯ãƒ¼ãƒ‰ã‚’ã‚¿ã‚¤ãƒˆãƒ«ã«è¨­å®š
+				// ŒŸõƒL[ƒ[ƒh‚ğƒ^ƒCƒgƒ‹‚Éİ’è
 				actionBar.setTitle(query);
 
-				// æ¤œç´¢ã‚­ãƒ¼ãƒ¯ãƒ¼ãƒ‰ã‚’åº§æ¨™ã¨å…±ã«WebApiã¸å¼•ãæ¸¡ã™
-				// ï¼“ç‚¹ãŒè¨­å®šã•ã‚Œã¦ã„ãªã„å ´åˆã¯ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’è¡¨ç¤ºã™ã‚‹
+				// ŒŸõƒL[ƒ[ƒh‚ğÀ•W‚Æ‹¤‚ÉWebApi‚Öˆø‚«“n‚·
+				// ‚R“_‚ªİ’è‚³‚ê‚Ä‚¢‚È‚¢ê‡‚ÍƒƒbƒZ[ƒW‚ğ•\¦‚·‚é
 				// if (mflg == 3) {
-				// ï¼“ç‚¹ã®ç¾åœ¨åº§æ¨™ã‚’æ ¼ç´ã™ã‚‹
+				// ‚R“_‚ÌŒ»İÀ•W‚ğŠi”[‚·‚é
 				// for (int i = 0 ; i < 3 ; i++){
 				// currentPoint[i] = marker[i].getPosition();
 				// }
 				
-				// MyAsyncTaskã‚¯ãƒ©ã‚¹ã«åº§æ¨™ãƒ»ã‚­ãƒ¼ãƒ¯ãƒ¼ãƒ‰ã‚’å¼•ãæ¸¡ã—ã€æ¤œç´¢ã‚’å®Ÿè¡Œã™ã‚‹
+				// MyAsyncTaskƒNƒ‰ƒX‚ÉÀ•WEƒL[ƒ[ƒh‚ğˆø‚«“n‚µAŒŸõ‚ğÀs‚·‚é
 				new MyAsyncTask(map, latitude, longitude, distance, item).execute(query);
 				// }else{
 				// Toast.makeText(getApplicationContext(),
-				// "æ¤œç´¢ç¯„å›²ã®æŒ‡å®šãŒä¸è¶³ã—ã¦ã„ã¾ã™ã€‚3ç‚¹ã§æŒ‡å®šã—ã¦ãã ã•ã„ã€‚",
+				// "ŒŸõ”ÍˆÍ‚Ìw’è‚ª•s‘«‚µ‚Ä‚¢‚Ü‚·B3“_‚Åw’è‚µ‚Ä‚­‚¾‚³‚¢B",
 				// Toast.LENGTH_SHORT).show();
 				// }
 
-				// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã§è¡¨ç¤ºã•ã‚Œã‚‹ã‚½ãƒ•ãƒˆã‚¦ã‚§ã‚¢ã‚­ãƒ¼ãƒœãƒ¼ãƒ‰ã‚’éè¡¨ç¤ºã«ã™ã‚‹
+				// ƒfƒtƒHƒ‹ƒg‚Å•\¦‚³‚ê‚éƒ\ƒtƒgƒEƒFƒAƒL[ƒ{[ƒh‚ğ”ñ•\¦‚É‚·‚é
 				InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 				inputMethodManager.hideSoftInputFromWindow(
 						searchView.getWindowToken(), 0);
 
-				// æ¤œç´¢ãƒœãƒƒã‚¯ã‚¹ã‚’é–‰ã˜ã‚‹
+				// ŒŸõƒ{ƒbƒNƒX‚ğ•Â‚¶‚é
 				searchMenu.collapseActionView();
 
 				return false;
@@ -396,7 +396,7 @@ public class MainActivity extends FragmentActivity implements
 
 			@Override
 			public boolean onQueryTextChange(String newText) {
-				// æ¤œç´¢ãƒœãƒƒã‚¯ã‚¹ã®å†…å®¹ãŒå¤‰æ›´ã•ã‚ŒãŸéš›ã«å®Ÿè¡Œ
+				// ŒŸõƒ{ƒbƒNƒX‚Ì“à—e‚ª•ÏX‚³‚ê‚½Û‚ÉÀs
 				return false;
 			}
 		});

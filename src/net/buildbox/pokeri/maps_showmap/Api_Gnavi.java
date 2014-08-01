@@ -11,25 +11,25 @@ public class Api_Gnavi extends WebApi {
 	String query;
 	String result;
 		
-	//æ¤œç´¢URLã‚’ä½œæˆã™ã‚‹
+	//ŒŸõURL‚ğì¬‚·‚é
 	@Override
 	protected String createUrl(String query, String lat, String lng){
 			
 	    String queryUrl = "http://api.gnavi.co.jp/ver1/RestSearchAPI/";
         String apiKey = "2ef4333acaf2e5ea9388911e3c6acdb2";
-        String qPage = "50"; //ä¸€åº¦ã®ãƒªã‚¯ã‚¨ã‚¹ãƒˆã§å¾—ã‚‹ãƒ¬ã‚¹ãƒãƒ³ã‚¹ä»¶æ•°ã®æœ€å¤§å€¤
+        String qPage = "50"; //ˆê“x‚ÌƒŠƒNƒGƒXƒg‚Å“¾‚éƒŒƒXƒ|ƒ“ƒXŒ”‚ÌÅ‘å’l
         String keyword = null;;
         String qLat = lat;
         String qLng = lng;
-        String range = "5"; //åŠå¾„3kmä»¥å†…ã®çµæœã‚’å–å¾—
+        String range = "5"; //”¼Œa3kmˆÈ“à‚ÌŒ‹‰Ê‚ğæ“¾
         
-        //æ¤œç´¢ã‚­ãƒ¼ãƒ¯ãƒ¼ãƒ‰ã‚’UTF-8ã§URLã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°ã™ã‚‹ï¼ˆAPIå´ã®è¦è«‹ã«åŸºã¥ãï¼‰
+        //ŒŸõƒL[ƒ[ƒh‚ğUTF-8‚ÅURLƒGƒ“ƒR[ƒfƒBƒ“ƒO‚·‚éiAPI‘¤‚Ì—v¿‚ÉŠî‚Ã‚­j
         try {
         	keyword = URLEncoder.encode(query, "utf-8");
         }catch (UnsupportedEncodingException e){
         	//do nothing
         }
-        // æ¤œç´¢ã‚¯ã‚¨ãƒªã¨ãªã‚‹URLã‚’ä½œæˆ
+        // ŒŸõƒNƒGƒŠ‚Æ‚È‚éURL‚ğì¬
     	queryUrl += "?keyid="+apiKey+"&hit_per_page="+qPage+"&coordinates_mode=2"+"&freeword=" + keyword + "&range=" + range + "&latitude=" + qLat + "&longitude=" + qLng;
 	
     	Log.d("GnaviApi", "url="+queryUrl);
@@ -37,15 +37,15 @@ public class Api_Gnavi extends WebApi {
     	return queryUrl;
 	}
 	
-	//åˆ‡ã‚Šå‡ºã™ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’æŒ‡å®šã—ã¦æ¤œç´¢çµæœã®xmlè§£æã‚’è¡Œã†
+	//Ø‚èo‚·ƒpƒ‰ƒ[ƒ^‚ğw’è‚µ‚ÄŒŸõŒ‹‰Ê‚Ìxml‰ğÍ‚ğs‚¤
 	@Override
 	protected String getResult(InputStream xml){
 		String result;
 		
-		//æ¤œç´¢çµæœã®xmlãƒ†ã‚­ã‚¹ãƒˆã‚’ã€ï¼‘åº—èˆ—ï¼‘è¡Œã®ã‚«ãƒ³ãƒåŒºåˆ‡ã‚Šãƒ†ã‚­ã‚¹ãƒˆã«æ•´å½¢ã™ã‚‹
-		//å¼•æ•°ï¼‘ï¼šxmlãƒ†ã‚­ã‚¹ãƒˆã€€å¼•æ•°ï¼’ä»¥é™ï¼šæŠ½å‡ºã—ãŸã„ã‚¿ã‚°åï¼ˆãŸã ã—è¨˜è¼‰ã™ã‚‹é †ç•ªã¯xmlãƒ†ã‚­ã‚¹ãƒˆä¸­ã«è¨˜è¿°ã•ã‚Œã‚‹é †ç•ªã¨ä¸€è‡´ã•ã›ã‚‹å¿…è¦ãŒã‚ã‚‹ï¼‰
-		//ä¸€åº¦ã«å¤šé‡ã®ã‚¿ã‚°ã‚’æŠ½å‡ºã—ã‚ˆã†ã¨ã™ã‚‹ã¨ã€å–å¾—çµæœãŒé€”ä¸­ã§é€”åˆ‡ã‚Œã‚‹ï¼ˆãƒ¡ãƒ¢ãƒªä¸è¶³ã®ãŸã‚ï¼Ÿï¼‰
-		//DLã—ãŸãƒ‡ãƒ¼ã‚¿ã¯ä¸€æ—¦ãƒ•ã‚¡ã‚¤ãƒ«ã«æ›¸ãå‡ºã—ãŸã»ã†ãŒè‰¯ã„ï¼Ÿ
+		//ŒŸõŒ‹‰Ê‚ÌxmlƒeƒLƒXƒg‚ğA‚P“X•Ü‚Ps‚ÌƒJƒ“ƒ}‹æØ‚èƒeƒLƒXƒg‚É®Œ`‚·‚é
+		//ˆø”‚PFxmlƒeƒLƒXƒg@ˆø”‚QˆÈ~F’Šo‚µ‚½‚¢ƒ^ƒO–¼i‚½‚¾‚µ‹LÚ‚·‚é‡”Ô‚ÍxmlƒeƒLƒXƒg’†‚É‹Lq‚³‚ê‚é‡”Ô‚Æˆê’v‚³‚¹‚é•K—v‚ª‚ ‚éj
+		//ˆê“x‚É‘½—Ê‚Ìƒ^ƒO‚ğ’Šo‚µ‚æ‚¤‚Æ‚·‚é‚ÆAæ“¾Œ‹‰Ê‚ª“r’†‚Å“rØ‚ê‚éiƒƒ‚ƒŠ•s‘«‚Ì‚½‚ßHj
+		//DL‚µ‚½ƒf[ƒ^‚Íˆê’Uƒtƒ@ƒCƒ‹‚É‘‚«o‚µ‚½‚Ù‚¤‚ª—Ç‚¢H
 		result = new XmlParse().execute(xml,"id","name","latitude","longitude","url","tel");
 		Log.d("GnaviApi", "result="+result);
 		
