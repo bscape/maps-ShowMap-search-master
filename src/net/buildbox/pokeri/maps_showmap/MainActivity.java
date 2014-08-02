@@ -1,5 +1,7 @@
 package net.buildbox.pokeri.maps_showmap;
 
+import java.util.ArrayList;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapsInitializer;
@@ -41,9 +43,9 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationButtonClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
 import com.navdrawer.SimpleSideDrawer;
-
 import android.app.ActionBar;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.location.Location;
 import static java.lang.Math.*;
 
@@ -53,8 +55,9 @@ public class MainActivity extends FragmentActivity implements
 		ConnectionCallbacks, OnConnectionFailedListener, LocationListener,
 		OnMyLocationButtonClickListener {
 
-	//--------------------------------------------------------------------------------------------	
-	//	クラス内共用変数の作成
+	// 検索結果用のマーカー
+	static public ArrayList<Marker> result_marker = new ArrayList<Marker>();
+
 
 	private FragmentManager fragmentManager;
 	private SupportMapFragment fragment;
@@ -66,8 +69,7 @@ public class MainActivity extends FragmentActivity implements
 	private int mflg = 0;
 	private int cflg = 0;
 	private String item;
-	private Circle circle;
-	
+	private Circle circle;	
 	private SimpleSideDrawer mNav;
 
 	double oY = 0; // ?ｿｽO?ｿｽS?ｿｽ?ｿｽlat
@@ -202,12 +204,6 @@ public class MainActivity extends FragmentActivity implements
 				map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
 				    @Override
 				    public void onMapLongClick(LatLng point) {
-				    	
-				    	CircleOptions circleOptions = new CircleOptions()
-				        .center(new LatLng(point.latitude,point.longitude))
-				        .radius(1000); 
-				    	map.addCircle(circleOptions);
-				    	
 				    	Toast.makeText(getApplicationContext(),
 				        		"長押しされた座標は " + point.latitude + ", " + point.longitude, Toast.LENGTH_SHORT).show();
 				    }
@@ -220,7 +216,7 @@ public class MainActivity extends FragmentActivity implements
 				 */
 
 				// スピナーの設定
-				String[] items = {"居酒屋", "カフェ", "観光"};
+				String[] items = {"居酒屋","観光"};
 				Spinner spinnerGenre = (Spinner) findViewById(R.id.spinnerGenre);
 				// アダプタにアイテムを追加
 				ArrayAdapter<String> adapter = new ArrayAdapter<String>(
@@ -256,6 +252,11 @@ public class MainActivity extends FragmentActivity implements
 				 */
 	}
 
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+	}
+	
 	// 地図上の選択範囲に円を重ねる
 	public void makeCircle() {
 
@@ -367,21 +368,14 @@ public class MainActivity extends FragmentActivity implements
 				// 検索キーワードをタイトルに設定
 				actionBar.setTitle(query);
 
-				// 検索キーワードを座標と共にWebApiへ引き渡す
-				// ３点が設定されていない場合はメッセージを表示する
-				// if (mflg == 3) {
-				// ３点の現在座標を格納する
-				// for (int i = 0 ; i < 3 ; i++){
-				// currentPoint[i] = marker[i].getPosition();
-				// }
-				
 				// MyAsyncTaskクラスに座標・キーワードを引き渡し、検索を実行する
+				if (mflg == 3){
 				new MyAsyncTask(map, latitude, longitude, distance, item).execute(query);
-				// }else{
-				// Toast.makeText(getApplicationContext(),
-				// "検索範囲の指定が不足しています。3点で指定してください。",
-				// Toast.LENGTH_SHORT).show();
-				// }
+				 }else{
+				 Toast.makeText(getApplicationContext(),
+				 "検索範囲の指定が不足しています。3点で指定してください。",
+				 Toast.LENGTH_SHORT).show();
+				 }
 
 				// デフォルトで表示されるソフトウェアキーボードを非表示にする
 				InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);

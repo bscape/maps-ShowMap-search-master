@@ -8,6 +8,7 @@ import static java.lang.Math.sin;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -19,27 +20,26 @@ import android.util.Log;
 
 public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 
+	// 検索結果用のマーカー
+	static Marker resultMarker[] = new Marker[1];
+
 	GoogleMap map = null;
-	String genre;
-	Marker marker = null;
+	String genre = null;
 	WebApi webApi = null;
-	// double oY = 0; //外心のlat
-	// double oX = 0; //外信のlng
 	double latitude = 0;
 	double longitude = 0;
 	double distance = 0; // 外接円の半径
 
 	// コンストラクタでメインスレッド（MainActivity.java）のmapや外心座標等を受け取る
 
-	public MyAsyncTask(GoogleMap map2, double latitude2, double longitude2,
-			int distance2, String item2) {
+	public MyAsyncTask(GoogleMap tmp_map, double tmp_latitude, double tmp_longitude,
+			int tmp_distance, String tmp_genre) {
 
-		map = map2;
-		latitude = latitude2;
-		longitude = longitude2;
-		distance = distance2;
-		genre = item2;
-		// TODO 閾ｪ蜍慕函謌舌＆繧後◆繧ｳ繝ｳ繧ｹ繝医Λ繧ｯ繧ｿ繝ｼ繝ｻ繧ｹ繧ｿ繝?
+		map = tmp_map;
+		latitude = tmp_latitude;
+		longitude = tmp_longitude;
+		distance = tmp_distance;
+		genre = tmp_genre;
 	}
 
 	@Override
@@ -72,13 +72,10 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 			http.connect();
 			// InputStream型変数inにデータをダウンロード
 			in = http.getInputStream();
-
 			// 検索結果のxmlから必要なパラメータを切り出す
 			result = webApi.getResult(in);
-
 			// 取得したxmlテキストをonPostExcecuteに引き渡す
 			return result;
-
 		} catch (Exception e) {
 			return e.toString();
 		} finally {
@@ -95,16 +92,21 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 	// @Override
 	protected void onPostExecute(String src) {
 
-		// int m = 0;
-		// if(marker[m] != null){
-		// marker[m].remove();
-		// m++;
-		// }
+		double lat = 0;
+		double lng = 0;
+
+		// 直前の検索結果を破棄
+		for (int i = 0; i < resultMarker.length; i++){
+			if (resultMarker[i] != null){
+				resultMarker[i].remove();
+			}
+		}
 		// マーカーのオプション用インスタンス
 		MarkerOptions options = new MarkerOptions();
-
 		// 1店舗1行の形で切り出して配列に格納
 		String[] strAry = src.split("\n");
+		// マーカー格納用の変数（のインスタンス）を新規作成
+		resultMarker = new  Marker[strAry.length];
 
 		for (int i = 0; i < strAry.length; i++) {
 
@@ -113,23 +115,19 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 			for (int j = 0; j < strAry2.length; j++) {
 			}
 
-			//API次第でlat,lngの順番が違うので、その対応も入れる
-			//API毎の切り出し型もAPIクラスの中に入れるべきか。
-			//座標の値をStringからDoubleに型変換
-
-			double lat = 0;
-			double lng = 0;
+			lat = 0;
+			lng = 0;
 
 			try {
 				if (webApi.getClass() == this
 						.getClass()
 						.getClassLoader()
 						.loadClass("net.buildbox.pokeri.maps_showmap.Api_Gnavi")) {
-					lat = Double.parseDouble(strAry2[2]);// lat
-					lng = Double.parseDouble(strAry2[3]);// lng
+					lat = Double.parseDouble(strAry2[2]);
+					lng = Double.parseDouble(strAry2[3]);
 				} else {
-					lat = Double.parseDouble(strAry2[3]);// lng
-					lng = Double.parseDouble(strAry2[2]);// lat
+					lat = Double.parseDouble(strAry2[3]);
+					lng = Double.parseDouble(strAry2[2]);
 				}
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
@@ -151,19 +149,14 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 
 			// 外心と店の距離が半径以内であれば外接円の内部。半径以上なら外部。
 			if (distance2 <= distance) {
-
 				// 表示位置を生成
 				// 極端に座標が近い場合は後から生成されたピンが既存のピンを上書きするらしい。「よかたい」で検索するとわかる。
 				LatLng posMapPoint = new LatLng(lat, lng);
-
 				// ピンとタイトル（店名）の設定
 				options.position(posMapPoint);
 				options.title(strAry2[1]);
-
 				// ピンを地図上に追加
-				// marker[m] = map.addMarker(options);
-				marker = map.addMarker(options);
-				// m++;
+				resultMarker[i] = map.addMarker(options);
 			}
 		}
 	}
