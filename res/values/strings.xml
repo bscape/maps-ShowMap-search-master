@@ -5,6 +5,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="menu_search">Search</string>
     <string name="result">Result</string>
-    <string name="beer">付近のお店を検索する</string>
+    <string name="beer">近辺のお店を探すことができます。\n☆クリックして調査開始☆ </string>
     <string name="title_activity_top">お店検索</string>
 </resources>
