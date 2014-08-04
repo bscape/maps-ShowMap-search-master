@@ -47,6 +47,7 @@ import android.app.ActionBar;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.location.Location;
+import android.location.LocationManager;
 import static java.lang.Math.*;
 
 //--------------------------------------------------------------------------------------------	
@@ -54,10 +55,6 @@ import static java.lang.Math.*;
 public class MainActivity extends FragmentActivity implements
 		ConnectionCallbacks, OnConnectionFailedListener, LocationListener,
 		OnMyLocationButtonClickListener {
-
-	// 検索結果用のマーカー
-	static public ArrayList<Marker> result_marker = new ArrayList<Marker>();
-
 
 	private FragmentManager fragmentManager;
 	private SupportMapFragment fragment;
@@ -77,21 +74,14 @@ public class MainActivity extends FragmentActivity implements
 	int distance = 0; // ?ｿｽO?ｿｽﾚ円?ｿｽﾌ費ｿｽ?ｿｽa
 
 	private LocationClient mLocationClient;
-
-	//--------------------------------------------------------------------------------------------
-	//	マップ関連の処理
-	/**
-	 * ３つのピンを立てる
-	 * ピンを立てて囲った範囲の色を変える
-	 * ぐるなび等のAPIと連携して検索する
-	 * 検索した場所にピンを立てる
-	 */
     
     // 位置情報の更新頻度・精度を設定する。
 	private static final LocationRequest REQUEST = LocationRequest.create()
 			.setInterval(5000) // 5 seconds
 			.setFastestInterval(16) // 16ms = 60fps
 			.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+	//--------------------------------------------------------------------------------------------
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -123,22 +113,29 @@ public class MainActivity extends FragmentActivity implements
 		// 現在地取得を許可
 	    map.setMyLocationEnabled(true);
 	    // 現在地ボタンタッチイベントを取得する
-	    map.setOnMyLocationButtonClickListener(this);
+//	    map.setOnMyLocationButtonClickListener(this);
 	    // Location Serviceを使用するため、LocationClientクラスのインスタンスを生成する
         mLocationClient = new LocationClient(
                 getApplicationContext(),
                 this,  // ConnectionCallbacks
                 this); // OnConnectionFailedListener
+        mLocationClient.connect();
 
 		MapsInitializer.initialize(this);
 
-		// 東京駅を表示
+		// 最新の現在地が取得出来なかった場合、東京駅付近を表示させる
+//		LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+//		Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+//		double lat = location.getLatitude();
+//		double lng = location.getLongitude();
+//		posMapPoint = new LatLng(lat, lng);
 		builder.target(posMapPoint);	// カメラの表示位置の指定
 		builder.zoom(13.0f);	// カメラのズームレベルの指定
 		builder.bearing(0);		// カメラの向きの指定
 		builder.tilt(25.0f);	// カメラの傾きの指定
 		map.moveCamera(CameraUpdateFactory.newCameraPosition(builder.build()));
 
+		
 		// マップ上のクリックイベント処理
 		map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 			@Override
@@ -204,8 +201,7 @@ public class MainActivity extends FragmentActivity implements
 				map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
 				    @Override
 				    public void onMapLongClick(LatLng point) {
-				    	Toast.makeText(getApplicationContext(),
-				        		"長押しされた座標は " + point.latitude + ", " + point.longitude, Toast.LENGTH_SHORT).show();
+				    	// Do Nothing
 				    }
 				});
 
@@ -312,7 +308,13 @@ public class MainActivity extends FragmentActivity implements
 
 	@Override
 	public void onLocationChanged(Location location) {
-		// Do nothing
+		// 現在地に移動
+		CameraPosition cameraPos = new CameraPosition.Builder()
+		.target(new LatLng(location.getLatitude(), location.getLongitude())).zoom(13.0f)
+		.bearing(0).build();
+		map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
+        mLocationClient.removeLocationUpdates(this);
+		
 	}
 
 	@Override
