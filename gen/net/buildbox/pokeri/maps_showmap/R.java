@@ -1653,7 +1653,7 @@ containing a value of this type.
         /**  Description of a share target (both in the list of such or the default share button) in a ShareActionProvider (share UI). [CHAR LIMIT=NONE] 
          */
         public static final int abc_shareactionprovider_share_with_application=0x7f05002b;
-        public static final int action_settings=0x7f05002e;
+        public static final int action_settings=0x7f05002f;
         public static final int app_name=0x7f05002d;
         public static final int auth_client_needs_enabling_title=0x7f050001;
         public static final int auth_client_needs_installation_title=0x7f050002;
@@ -1661,7 +1661,6 @@ containing a value of this type.
         public static final int auth_client_play_services_err_notification_msg=0x7f050004;
         public static final int auth_client_requested_by_msg=0x7f050005;
         public static final int auth_client_using_bad_version_title=0x7f050000;
-        public static final int beer=0x7f050032;
         /**  Button in confirmation dialog to enable Google Play services.  Clicking it
         will direct user to application settings of Google Play services where they
         can enable it [CHAR LIMIT=40] 
@@ -1751,10 +1750,12 @@ containing a value of this type.
         /**  Long form sign-in button text [CHAR LIMIT=30] 
          */
         public static final int common_signin_button_text_long=0x7f05001e;
-        public static final int hello_world=0x7f05002f;
-        public static final int menu_search=0x7f050030;
-        public static final int result=0x7f050031;
-        public static final int title_activity_top=0x7f050033;
+        public static final int hello_world=0x7f050030;
+        public static final int menu_search=0x7f050031;
+        public static final int result=0x7f050032;
+        public static final int start_main=0x7f050033;
+        public static final int title_activity_main=0x7f050034;
+        public static final int title_activity_top=0x7f05002e;
         /**  Text on a placeholder buy button when Google Play services is not
          available or up-to-date 
          */

@@ -17,12 +17,15 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
+import android.content.Context;
 
 public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 
 	// 検索結果用のマーカー
 	static Marker resultMarker[] = new Marker[1];
 
+	Context context = null;
 	GoogleMap map = null;
 	String genre = null;
 	WebApi webApi = null;
@@ -33,13 +36,14 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 	// コンストラクタでメインスレッド（MainActivity.java）のmapや外心座標等を受け取る
 
 	public MyAsyncTask(GoogleMap tmp_map, double tmp_latitude, double tmp_longitude,
-			int tmp_distance, String tmp_genre) {
+			int tmp_distance, String tmp_genre, Context tmp_con) {
 
 		map = tmp_map;
 		latitude = tmp_latitude;
 		longitude = tmp_longitude;
 		distance = tmp_distance;
 		genre = tmp_genre;
+		context = tmp_con;
 	}
 
 	@Override
@@ -75,9 +79,11 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 			// 検索結果のxmlから必要なパラメータを切り出す
 			result = webApi.getResult(in);
 			// 取得したxmlテキストをonPostExcecuteに引き渡す
+			if (result.equals("")) return "no result";
 			return result;
 		} catch (Exception e) {
-			return e.toString();
+			Log.d("通信エラー", ""+e.toString());
+			return "communication error";
 		} finally {
 			try {
 				if (http != null)
@@ -92,6 +98,19 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 	// @Override
 	protected void onPostExecute(String src) {
 
+		if (src.equals("communication error")){
+			 Toast.makeText(context.getApplicationContext(),
+			 "通信エラーです。",
+			 Toast.LENGTH_SHORT).show();
+			return;
+		}
+		if (src.equals("no result")){
+			 Toast.makeText(context.getApplicationContext(),
+			 "検索結果は0件でした。",
+			 Toast.LENGTH_SHORT).show();
+			return;
+		}
+		
 		double lat = 0;
 		double lng = 0;
 

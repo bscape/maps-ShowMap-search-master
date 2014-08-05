@@ -461,7 +461,7 @@ int string abc_searchview_description_submit 0x7f050027
 int string abc_searchview_description_voice 0x7f050028
 int string abc_shareactionprovider_share_with 0x7f05002c
 int string abc_shareactionprovider_share_with_application 0x7f05002b
-int string action_settings 0x7f05002e
+int string action_settings 0x7f05002f
 int string app_name 0x7f05002d
 int string auth_client_needs_enabling_title 0x7f050001
 int string auth_client_needs_installation_title 0x7f050002
@@ -469,7 +469,6 @@ int string auth_client_needs_update_title 0x7f050003
 int string auth_client_play_services_err_notification_msg 0x7f050004
 int string auth_client_requested_by_msg 0x7f050005
 int string auth_client_using_bad_version_title 0x7f050000
-int string beer 0x7f050032
 int string common_google_play_services_enable_button 0x7f050011
 int string common_google_play_services_enable_text 0x7f050010
 int string common_google_play_services_enable_title 0x7f05000f
@@ -495,10 +494,12 @@ int string common_google_play_services_update_text 0x7f050013
 int string common_google_play_services_update_title 0x7f050012
 int string common_signin_button_text 0x7f05001d
 int string common_signin_button_text_long 0x7f05001e
-int string hello_world 0x7f05002f
-int string menu_search 0x7f050030
-int string result 0x7f050031
-int string title_activity_top 0x7f050033
+int string hello_world 0x7f050030
+int string menu_search 0x7f050031
+int string result 0x7f050032
+int string start_main 0x7f050033
+int string title_activity_main 0x7f050034
+int string title_activity_top 0x7f05002e
 int string wallet_buy_button_place_holder 0x7f05001f
 int style AppBaseTheme 0x7f09008f
 int style AppTheme 0x7f090090

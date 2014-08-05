@@ -372,7 +372,7 @@ public class MainActivity extends FragmentActivity implements
 
 				// MyAsyncTaskクラスに座標・キーワードを引き渡し、検索を実行する
 				if (mflg == 3){
-				new MyAsyncTask(map, latitude, longitude, distance, item).execute(query);
+				new MyAsyncTask(map, latitude, longitude, distance, item, getApplicationContext()).execute(query);
 				 }else{
 				 Toast.makeText(getApplicationContext(),
 				 "検索範囲の指定が不足しています。3点で指定してください。",
