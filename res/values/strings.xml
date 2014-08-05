@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">幹事お助け！</string>
+    <string name="app_name">２次会幹事</string>
+    <string name="title_activity_top">☆幹事お助けアプリ☆\n　急げ！２次会のお店検索</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_search">Search</string>
     <string name="result">Result</string>
-    <string name="beer">お店を探す！</string>
-    <string name="title_activity_top">お店検索</string>
+    <string name="start_main">近辺のお店を探すことができます。\n☆クリックして調査開始☆ </string>
+    <string name="title_activity_main">☆お店検索☆</string>
 </resources>

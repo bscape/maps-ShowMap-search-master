@@ -20,7 +20,7 @@ public class Top extends Activity implements OnClickListener {
 		
 		Button btn = (Button)findViewById(R.id.beer1);
 		Animation feedin_btn = AnimationUtils.loadAnimation( this, R.anim.animation );
-		feedin_btn.setDuration( 10000 );
+//		feedin_btn.setDuration( 10000 );
 		btn.startAnimation( feedin_btn );
 		
 //		View beer = findViewById(R.id.beer1);
