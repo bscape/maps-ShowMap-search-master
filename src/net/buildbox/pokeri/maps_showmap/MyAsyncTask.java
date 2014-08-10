@@ -17,6 +17,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 import android.content.Context;
 
@@ -32,11 +33,13 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 	double latitude = 0;
 	double longitude = 0;
 	double distance = 0; // 外接円の半径
+	
+	private ArrayAdapter<String> arrayAdapter = null; //　sideviewのlist追加用アダプタ
 
 	// コンストラクタでメインスレッド（MainActivity.java）のmapや外心座標等を受け取る
 
 	public MyAsyncTask(GoogleMap tmp_map, double tmp_latitude, double tmp_longitude,
-			int tmp_distance, String tmp_genre, Context tmp_con) {
+			int tmp_distance, String tmp_genre, Context tmp_con, ArrayAdapter<String> tmp_arrayAdapter) {
 
 		map = tmp_map;
 		latitude = tmp_latitude;
@@ -44,6 +47,7 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 		distance = tmp_distance;
 		genre = tmp_genre;
 		context = tmp_con;
+		arrayAdapter = tmp_arrayAdapter;
 	}
 
 	@Override
@@ -126,6 +130,8 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 		String[] strAry = src.split("\n");
 		// マーカー格納用の変数（のインスタンス）を新規作成
 		resultMarker = new  Marker[strAry.length];
+		//　sideviewの一覧クリア
+		arrayAdapter.clear();
 
 		for (int i = 0; i < strAry.length; i++) {
 
@@ -176,6 +182,9 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 				options.title(strAry2[1]);
 				// ピンを地図上に追加
 				resultMarker[i] = map.addMarker(options);
+				
+				//　お店の名前、URL、電話番号をsideviewに追加。
+				arrayAdapter.add(strAry2[1]+"\n"+strAry2[4]+"\n"+strAry2[5]+"\n");
 			}
 		}
 	}
