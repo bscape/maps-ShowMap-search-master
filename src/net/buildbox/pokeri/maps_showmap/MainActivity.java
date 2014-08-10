@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -26,6 +27,7 @@ import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -45,6 +47,7 @@ import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
 import com.navdrawer.SimpleSideDrawer;
 import android.app.ActionBar;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationManager;
@@ -68,6 +71,8 @@ public class MainActivity extends FragmentActivity implements
 	private String item;
 	private Circle circle;	
 	private SimpleSideDrawer mNav;
+	private ListView listView = null;
+	private ArrayAdapter<String> arrayAdapter = null;
 
 	double oY = 0; // ?ｿｽO?ｿｽS?ｿｽ?ｿｽlat
 	double oX = 0; // ?ｿｽO?ｿｽS?ｿｽ?ｿｽlng
@@ -88,12 +93,36 @@ public class MainActivity extends FragmentActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
+		// sideviewへのlist追加用アダプタを宣言
+		arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1);
+		
+		// sideview表示関数、レイアウトの呼び出し
 		mNav = new SimpleSideDrawer(this);
         mNav.setLeftBehindContentView(R.layout.activity_behind_left_simple);
         findViewById(R.id.leftBtn).setOnClickListener(new OnClickListener() {
             @Override 
             public void onClick(View v) {
                 mNav.toggleLeftDrawer();
+                listView = (ListView)findViewById(R.id.listview);
+                listView.setAdapter(arrayAdapter);
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view,
+                            int position, long id) {
+                        ListView listView = (ListView) parent;
+                        // クリックされたアイテムを取得します
+                        String item = (String) listView.getItemAtPosition(position);
+                        String[] strAry = item.split("\n");
+                        //Toast.makeText(MainActivity.this, item, Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent();
+                        // インテントにアクション及びURLをセット
+                        intent.setAction(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse(strAry[1]));
+                        // ブラウザ起動
+                        startActivity(intent);
+                        
+                    }
+                });
             }
         });
 
@@ -372,7 +401,7 @@ public class MainActivity extends FragmentActivity implements
 
 				// MyAsyncTaskクラスに座標・キーワードを引き渡し、検索を実行する
 				if (mflg == 3){
-				new MyAsyncTask(map, latitude, longitude, distance, item, getApplicationContext()).execute(query);
+				new MyAsyncTask(map, latitude, longitude, distance, item, getApplicationContext(), arrayAdapter).execute(query);
 				 }else{
 				 Toast.makeText(getApplicationContext(),
 				 "検索範囲の指定が不足しています。3点で指定してください。",
