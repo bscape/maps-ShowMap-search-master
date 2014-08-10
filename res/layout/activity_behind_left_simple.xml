@@ -1,20 +1,9 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/leftBehindMenuScroll" >
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:layout_width="fill_parent" 
+    android:layout_height="fill_parent"> 
 
-    <LinearLayout style="@style/behindMenuScrollContent"
-        android:paddingTop="25dp" >
-        <TextView
-            style="@style/behindMenuItemTitle"
-            android:text="検索結果一覧" />
-        <TextView
-            style="@style/behindMenuItemLabel"
-            android:text="Item0" />
-        <TextView
-            style="@style/behindMenuItemLabel"
-            android:text="Item1" />
-        <Button
-            android:id="@+id/behind_btn"
-            style="@style/behindMenuItemLabel"
-            android:text="BUTTON" />
-    </LinearLayout>
-</ScrollView>
+    <ListView android:id="@+id/listview" 
+        android:layout_width="200dip" 
+        android:layout_height="wrap_content" /> 
+	
+</LinearLayout> 
