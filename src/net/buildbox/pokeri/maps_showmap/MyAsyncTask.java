@@ -19,6 +19,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 
 public class MyAsyncTask extends AsyncTask<String, Integer, String> {
@@ -33,6 +35,7 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 	double latitude = 0;
 	double longitude = 0;
 	double distance = 0; // 外接円の半径
+    public  ProgressDialog m_ProgressDialog = null;
 	
 	private ArrayAdapter<String> arrayAdapter = null; //　sideviewのlist追加用アダプタ
 
@@ -48,8 +51,26 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 		genre = tmp_genre;
 		context = tmp_con;
 		arrayAdapter = tmp_arrayAdapter;
+		
 	}
 
+	ProgressDialog dlg = null;
+	
+	// 検索中のダイアログを表示
+	@Override
+	public void onPreExecute() {
+		dlg = new ProgressDialog(context);
+		dlg.setIndeterminate(true);
+		dlg.setMessage("検索中");
+		dlg.show();
+	}
+	
+	// ダイアログのキャンセル処理
+//	@Override
+//	public void onCancelled(){
+//		dlg.dismiss();
+//	}
+		 
 	@Override
 	public String doInBackground(String... params) {
 
@@ -59,6 +80,7 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 		String queryUrl = Api_Gnavi.createUrl(params[0], String.valueOf(latitude),String.valueOf(longitude),genre);
 
 		// ---------------------------------------------------------------------------------------------
+				
 		HttpURLConnection http = null;
 		InputStream in = null;
 		URL url = null;
@@ -74,6 +96,8 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 			in = http.getInputStream();
 			// 検索結果のxmlから必要なパラメータを切り出す
 			result = Api_Gnavi.getResult(in);
+			// 検索終了と共に進捗ダイアログを画面から削除
+			dlg.dismiss();
 			// 取得したxmlテキストをonPostExcecuteに引き渡す
 			if (result.equals("")) return "no result";
 			return result;
@@ -122,6 +146,8 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 		resultMarker = new  Marker[strAry.length];
 		//　sideviewの一覧クリア
 		arrayAdapter.clear();
+		// 表示できる検索結果があったかどうかのフラグ
+		boolean markerFlg = false;
 
 		for (int i = 0; i < strAry.length; i++) {
 
@@ -165,17 +191,25 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 			// 外心と店の距離が半径以内であれば外接円の内部。半径以上なら外部。
 			if (distance2 <= distance) {
 				// 表示位置を生成
-				// 極端に座標が近い場合は後から生成されたピンが既存のピンを上書きするらしい。「よかたい」で検索するとわかる。
+				// 極端に座標が近い場合は後から生成されたピンが既存のピンを上書きするらしい。
 				LatLng posMapPoint = new LatLng(lat, lng);
 				// ピンとタイトル（店名）の設定
 				options.position(posMapPoint);
 				options.title(strAry2[1]);
 				// ピンを地図上に追加
 				resultMarker[i] = map.addMarker(options);
-				
 				//　お店の名前、URL、電話番号をsideviewに追加。
 				arrayAdapter.add(strAry2[1]+"\n"+strAry2[4]+"\n"+strAry2[5]+"\n");
+				// 「表示できる検索結果があった」ことのフラグを立てる
+				markerFlg = true;
 			}
 		}
+		
+		if (! markerFlg){
+			 Toast.makeText(context.getApplicationContext(),
+			 "検索結果は0件でした。",
+			 Toast.LENGTH_SHORT).show();
+		}
+		
 	}
 }

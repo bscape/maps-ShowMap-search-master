@@ -23,7 +23,7 @@
 <Spinner
     android:id="@+id/spinnerGenre"
     android:layout_width="151dp"
-    android:layout_height="wrap_content"
+    android:layout_height="30dp"
     android:layout_alignParentLeft="true"
     android:layout_alignParentTop="true"
     android:layout_marginTop="56dp"

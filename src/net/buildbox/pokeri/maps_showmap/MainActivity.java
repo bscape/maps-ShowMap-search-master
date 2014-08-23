@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -73,6 +74,8 @@ public class MainActivity extends FragmentActivity implements
 	private SimpleSideDrawer mNav;
 	private ListView listView = null;
 	private ArrayAdapter<String> arrayAdapter = null;
+	private String query = "居酒屋";
+	private int backflg = 0;
 
 	double oY = 0; // ?ｿｽO?ｿｽS?ｿｽ?ｿｽlat
 	double oX = 0; // ?ｿｽO?ｿｽS?ｿｽ?ｿｽlng
@@ -87,6 +90,7 @@ public class MainActivity extends FragmentActivity implements
 			.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
 	//--------------------------------------------------------------------------------------------
+    // Activity関連
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -148,7 +152,7 @@ public class MainActivity extends FragmentActivity implements
                 this); // OnConnectionFailedListener
         mLocationClient.connect();
 
-		MapsInitializer.initialize(this);
+		MapsInitializer.initialize(MainActivity.this);
 
 		// 最新の現在地が取得出来なかった場合、東京駅付近を表示させる
 		builder.target(posMapPoint);	// カメラの表示位置の指定
@@ -243,30 +247,63 @@ public class MainActivity extends FragmentActivity implements
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		// アダプタの設定
 		spinnerGenre.setAdapter(adapter);
-		// ポジションの指定
+		// デフォルトポジションの指定
 		spinnerGenre.setSelection(0);
-		
+		// プルダウンメニュー選択操作のリスナー
 		spinnerGenre.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view,
 					int position, long id) {
 				Spinner spnGenre = (Spinner) parent;
 				item = (String) spnGenre.getItemAtPosition(position);
+				Log.d("selected", "item=" + item);
+				// MyAsyncTaskクラスに座標・キーワードを引き渡し、検索を実行する
+				new MyAsyncTask(map, oY, oX, distance, item, MainActivity.this, arrayAdapter).execute("");
+				// アクションバーを取得
+				ActionBar actionBar = getActionBar();
+				// 検索キーワードをタイトルに設定
+				actionBar.setTitle("ジャンル：" + item);
+				// 戻るボタンのフラグを初期化
+				backflg = 0;
 				}
 				@Override
 				public void onNothingSelected(AdapterView<?> parent) {
+					Log.d("nothingselected", "item=" + item);
 				}
+				
 			});
-		
-
-		Log.d("oX oY ","oX=" + oX + "oY=" + oY);
-
 	}
 
+	// 画面が回転しても状態をセーブするようにする
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
 	}
+	
+	//戻るボタンが押された場合の処理
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event){
+		if(keyCode == KeyEvent.KEYCODE_BACK && backflg == 0){
+			backflg = 1;
+			// 検索結果を破棄
+			for (int i = 0; i < MyAsyncTask.resultMarker.length; i++){
+				if (MyAsyncTask.resultMarker[i] != null){
+					MyAsyncTask.resultMarker[i].remove();
+				}
+			}
+		}else if(backflg == 1){
+			backflg = 2;
+			Toast.makeText(getApplicationContext(),
+				 "もう一度押すと終了します",
+				 Toast.LENGTH_SHORT).show();
+		}else if(backflg == 2){
+			finish();
+		}
+		return false;
+	}
+	
+
+	// --------------------------------------------------------------------------------------------
 	
 	// 地図上の選択範囲に円を重ねる
 	public void makeCircle() {
@@ -346,8 +383,10 @@ public class MainActivity extends FragmentActivity implements
 		circle = map.addCircle(circleOptions);
 
 		// MyAsyncTaskクラスに座標・キーワードを引き渡し、検索を実行する
-		new MyAsyncTask(map, oY, oX, distance, item, getApplicationContext(), arrayAdapter).execute("");
-       
+		new MyAsyncTask(map, oY, oX, distance, item, MainActivity.this, arrayAdapter).execute("");
+		// 戻るボタンのフラグを初期化
+		backflg = 0;
+
 	}
 
 	@Override
@@ -369,7 +408,6 @@ public class MainActivity extends FragmentActivity implements
 		return false;
 	}
 
-	// --------------------------------------------------------------------------------------------
 	// アクションバーの検索ボックス
 
 	@Override
@@ -385,11 +423,19 @@ public class MainActivity extends FragmentActivity implements
 
 		// 検索開始ボタンを表示
 		searchView.setSubmitButtonEnabled(true);
-
+		
+		// デフォルトのキーワードを設定
+		searchView.setQueryHint(query);
+		
 		// 検索文字列を入力した際や、検索実行時に呼ばれる各種リスナーを設定
 		searchView.setOnQueryTextListener(new OnQueryTextListener() {
 			@Override
-			public boolean onQueryTextSubmit(String query) {
+			public boolean onQueryTextSubmit(String tmp_q) {
+				
+				query = tmp_q;
+
+				searchView.setQueryHint(query);
+				
 				// アクションバーを取得
 				ActionBar actionBar = getActionBar();
 
@@ -399,11 +445,13 @@ public class MainActivity extends FragmentActivity implements
 				// MyAsyncTaskクラスに座標・キーワードを引き渡し、検索を実行する
 				// 検索範囲として3点指定済み、もしくは現在地取得済みの場合、検索を実行する
 				if (mflg == 3 || circle != null){
-				new MyAsyncTask(map, oY, oX, distance, item, getApplicationContext(), arrayAdapter).execute(query);
+					new MyAsyncTask(map, oY, oX, distance, item, MainActivity.this, arrayAdapter).execute(query);
+					// 戻るボタンのフラグを初期化
+					backflg = 0;
 				 }else{
-				 Toast.makeText(getApplicationContext(),
-				 "検索範囲の指定が不足しています。3点で指定してください。",
-				 Toast.LENGTH_SHORT).show();
+					Toast.makeText(getApplicationContext(),
+					"検索範囲の指定が不足しています。3点で指定してください。",
+					Toast.LENGTH_SHORT).show();
 				 }
 
 				// デフォルトで表示されるソフトウェアキーボードを非表示にする
