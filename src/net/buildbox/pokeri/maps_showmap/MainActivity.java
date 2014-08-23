@@ -77,6 +77,7 @@ public class MainActivity extends FragmentActivity implements
 	private String query = "居酒屋";
 	private int backflg = 0;
 	private boolean getlocatinflg = false;
+	private int endflg = 0;
 
 	double oY = 0; // ?ｿｽO?ｿｽS?ｿｽ?ｿｽlat
 	double oX = 0; // ?ｿｽO?ｿｽS?ｿｽ?ｿｽlng
@@ -296,11 +297,28 @@ public class MainActivity extends FragmentActivity implements
 				}
 			}
 		}else if(backflg == 1){
-			backflg = 2;
-			Toast.makeText(getApplicationContext(),
-				 "もう一度押すと終了します",
-				 Toast.LENGTH_SHORT).show();
-		}else if(backflg == 2){
+			// 範囲選択のマーカーや円が表示されていた場合は、それらを破棄する
+			// 地図上に何も表示されていない場合は「もう一度押すと終了します」を表示する
+			if (marker[0] != null || circle != null) {
+				for (int i = 0; i < marker.length; i++){
+					if (marker[i] != null){
+						marker[i].remove();
+					}
+					marker[i] = null;
+					mflg = 0;
+					cflg = 0;
+				}
+				if (circle != null){
+					circle.remove();
+					circle = null;
+				}
+				endflg = 0;
+			}else{
+				Toast.makeText(getApplicationContext(),"もう一度押すと終了します",Toast.LENGTH_SHORT).show();
+				endflg++ ;
+			}
+		}
+		if(endflg == 2){
 			finish();
 		}
 		return false;
@@ -451,6 +469,7 @@ public class MainActivity extends FragmentActivity implements
 				// 検索範囲として3点指定済み、もしくは現在地取得済みの場合、検索を実行する
 				if (mflg == 3 || circle != null){
 					new MyAsyncTask(map, oY, oX, distance, item, MainActivity.this, arrayAdapter).execute(query);
+					Log.d("distance", ""+distance);
 					// 戻るボタンのフラグを初期化
 					backflg = 0;
 				 }else{
