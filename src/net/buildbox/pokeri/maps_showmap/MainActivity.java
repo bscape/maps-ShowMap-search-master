@@ -152,7 +152,7 @@ public class MainActivity extends FragmentActivity implements
 
 		// 最新の現在地が取得出来なかった場合、東京駅付近を表示させる
 		builder.target(posMapPoint);	// カメラの表示位置の指定
-		builder.zoom(15.0f);	// カメラのズームレベルの指定
+		builder.zoom(18.0f);	// カメラのズームレベルの指定
 		builder.bearing(0);		// カメラの向きの指定
 		builder.tilt(25.0f);	// カメラの傾きの指定
 		map.moveCamera(CameraUpdateFactory.newCameraPosition(builder.build()));
@@ -172,7 +172,7 @@ public class MainActivity extends FragmentActivity implements
 					options.position(new LatLng(pointarray[mflg].latitude,
 							pointarray[mflg].longitude));
 					// ピンのタイトルを設定
-					options.title("マーカー"+mflg+"座標は " + point.latitude + ", " + point.longitude);
+					options.title("このピンをロングタップすると動かせます");
 					// ピンの色を設定
 					BitmapDescriptor icon = BitmapDescriptorFactory
 							.defaultMarker(BitmapDescriptorFactory.HUE_BLUE);
@@ -187,6 +187,12 @@ public class MainActivity extends FragmentActivity implements
 				if (mflg >= 3) {
 
 					if (cflg == 0) {
+						
+						//自動検索で作成された円が既に存在していた場合はそれを削除
+						if (circle != null){
+							circle.remove();
+						}
+
 						makeCircle();
 						cflg = cflg + 1;
 					}
@@ -227,35 +233,35 @@ public class MainActivity extends FragmentActivity implements
 				    }
 				});
 
-			//--------------------------------------------------------------------------------------------
-			// スピナーの設定
-			String[] items = {"居酒屋","観光"};
-			Spinner spinnerGenre = (Spinner) findViewById(R.id.spinnerGenre);
-			// アダプタにアイテムを追加
-			ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-					this,
-					android.R.layout.simple_spinner_item,
-					items);
-			adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-			// アダプタの設定
-			spinnerGenre.setAdapter(adapter);
-			// スピナーのタイトル設定
-			spinnerGenre.setPrompt("ジャンルの選択");
-			// ポジションの指定
-			spinnerGenre.setSelection(0);
-			
-			spinnerGenre.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+		//--------------------------------------------------------------------------------------------
+		// スピナーの設定
+		String[] items = {"居酒屋","観光"};
+		Spinner spinnerGenre = (Spinner) findViewById(R.id.spinnerGenre);
+		// アダプタにアイテムを追加
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+				this,
+				android.R.layout.simple_spinner_item,
+				items);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		// アダプタの設定
+		spinnerGenre.setAdapter(adapter);
+		// スピナーのタイトル設定
+		spinnerGenre.setPrompt("ジャンルの選択");
+		// ポジションの指定
+		spinnerGenre.setSelection(0);
+		
+		spinnerGenre.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view,
+					int position, long id) {
+				Spinner spnGenre = (Spinner) parent;
+				item = (String) spnGenre.getItemAtPosition(position);
+				// Do nothing
+				}
 				@Override
-				public void onItemSelected(AdapterView<?> parent, View view,
-						int position, long id) {
-					Spinner spnGenre = (Spinner) parent;
-					item = (String) spnGenre.getItemAtPosition(position);
-					// Do nothing
-					}
-					@Override
-					public void onNothingSelected(AdapterView<?> parent) {
-					}
-				});
+				public void onNothingSelected(AdapterView<?> parent) {
+				}
+			});
 	}
 
 	@Override
@@ -331,7 +337,7 @@ public class MainActivity extends FragmentActivity implements
 
 		// 現在地にカメラを移動
 		CameraPosition cameraPos = new CameraPosition.Builder()
-		.target(new LatLng(nlat, nlng)).zoom(15.0f)
+		.target(new LatLng(nlat, nlng)).zoom(18.0f)
 		.bearing(0).build();
 		map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
         mLocationClient.removeLocationUpdates(this);
@@ -350,20 +356,17 @@ public class MainActivity extends FragmentActivity implements
 
 	@Override
 	public void onConnected(Bundle connectionHint) {
-		mLocationClient.requestLocationUpdates(REQUEST, this); // this =
-																// LocationListener
+		mLocationClient.requestLocationUpdates(REQUEST, this); // this = LocationListener
 	}
 
 	@Override
 	public void onDisconnected() {
 		// Do nothing
 	}
-
 	@Override
 	public void onConnectionFailed(ConnectionResult result) {
 		// Do nothing
 	}
-
 	@Override
 	public boolean onMyLocationButtonClick() {
 		// Do nothing
