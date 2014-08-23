@@ -152,7 +152,7 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 		for (int i = 0; i < strAry.length; i++) {
 
 			// 1“X•Ü‚ÌŠeƒpƒ‰ƒ[ƒ^‚ðØ‚èo‚µ‚Ä”z—ñ‚ÉŠi”[
-			String[] strAry2 = strAry[i].split(",");
+			String[] strAry2 = strAry[i].split(",,");
 			for (int j = 0; j < strAry2.length; j++) {
 			}
 

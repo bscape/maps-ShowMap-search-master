@@ -44,7 +44,7 @@ public class XmlParse {
 	        		tagName = xmlPullParser.getName();
 	        		
 	        		if (tagName.equals(idTag)){
-	        			result += xmlPullParser.nextText() + ",";
+	        			result += xmlPullParser.nextText() + ",,";
 	        			idFlg = true; //←同じ名前のタグは最初に出てきたものしか拾わないようにするための仕掛け
 	        		}
 	        		
@@ -52,7 +52,7 @@ public class XmlParse {
 	        		if (idFlg){
 		        		for (int i = 0 ; i < tag.length ; i++){
 		        			if (tagName.equals(tag[i])){
-			        			result += xmlPullParser.nextText() + ",";
+			        			result += xmlPullParser.nextText() + ",,";
 			        		}
 		        		}
 		        		//抽出対象の最後尾タグを処理した場合、最後に改行を追記する

@@ -70,12 +70,13 @@ public class MainActivity extends FragmentActivity implements
 	private int mflg = 0;
 	private int cflg = 0;
 	private String item;
-	private Circle circle;	
+	private Circle circle = null;	
 	private SimpleSideDrawer mNav;
 	private ListView listView = null;
 	private ArrayAdapter<String> arrayAdapter = null;
 	private String query = "居酒屋";
 	private int backflg = 0;
+	private boolean getlocatinflg = false;
 
 	double oY = 0; // ?ｿｽO?ｿｽS?ｿｽ?ｿｽlat
 	double oX = 0; // ?ｿｽO?ｿｽS?ｿｽ?ｿｽlng
@@ -257,15 +258,18 @@ public class MainActivity extends FragmentActivity implements
 				Spinner spnGenre = (Spinner) parent;
 				item = (String) spnGenre.getItemAtPosition(position);
 				Log.d("selected", "item=" + item);
-				// MyAsyncTaskクラスに座標・キーワードを引き渡し、検索を実行する
-				new MyAsyncTask(map, oY, oX, distance, item, MainActivity.this, arrayAdapter).execute("");
-				// アクションバーを取得
-				ActionBar actionBar = getActionBar();
-				// 検索キーワードをタイトルに設定
-				actionBar.setTitle("ジャンル：" + item);
-				// 戻るボタンのフラグを初期化
-				backflg = 0;
+				
+				if (getlocatinflg || mflg == 3){
+					// MyAsyncTaskクラスに座標・キーワードを引き渡し、検索を実行する
+					new MyAsyncTask(map, oY, oX, distance, item, MainActivity.this, arrayAdapter).execute("");
+					// アクションバーを取得
+					ActionBar actionBar = getActionBar();
+					// 検索キーワードをタイトルに設定
+					actionBar.setTitle("ジャンル：" + item);
+					// 戻るボタンのフラグを初期化
+					backflg = 0;
 				}
+			}
 				@Override
 				public void onNothingSelected(AdapterView<?> parent) {
 					Log.d("nothingselected", "item=" + item);
@@ -386,7 +390,8 @@ public class MainActivity extends FragmentActivity implements
 		new MyAsyncTask(map, oY, oX, distance, item, MainActivity.this, arrayAdapter).execute("");
 		// 戻るボタンのフラグを初期化
 		backflg = 0;
-
+		// 現在地取得に成功したフラグを立てる
+		getlocatinflg = true;
 	}
 
 	@Override

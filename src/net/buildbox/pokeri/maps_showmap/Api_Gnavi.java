@@ -52,7 +52,7 @@ public class Api_Gnavi extends WebApi {
     			String[] strAry = result.split("\n");
 				// 指定した大業態の業態コードを取得
     			for (int i = 0; i < strAry.length; i++) {
-    				String[] strAry2 = strAry[i].split(",");
+    				String[] strAry2 = strAry[i].split(",,");
     				if(strAry2[1].equals(genre)){
     					genre = "&category_l=" + strAry2[0];
     					break;
