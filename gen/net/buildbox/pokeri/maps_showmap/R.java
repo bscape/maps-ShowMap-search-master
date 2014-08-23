@@ -1482,7 +1482,6 @@ containing a value of this type.
         public static final int always=0x7f07001e;
         public static final int beer1=0x7f070052;
         public static final int beginning=0x7f070023;
-        public static final int behind_btn=0x7f07004e;
         public static final int book_now=0x7f070010;
         public static final int buyButton=0x7f07000a;
         public static final int buy_now=0x7f07000f;
@@ -1511,6 +1510,7 @@ containing a value of this type.
         public static final int leftBtn=0x7f070051;
         public static final int listMode=0x7f070014;
         public static final int list_item=0x7f07003b;
+        public static final int listview=0x7f07004e;
         public static final int match_parent=0x7f07000c;
         public static final int menu_search=0x7f070053;
         public static final int middle=0x7f070024;

@@ -141,8 +141,6 @@ public class MainActivity extends FragmentActivity implements
 
 		// 現在地取得を許可
 	    map.setMyLocationEnabled(true);
-	    // 現在地ボタンタッチイベントを取得する
-//	    map.setOnMyLocationButtonClickListener(this);
 	    // Location Serviceを使用するため、LocationClientクラスのインスタンスを生成する
         mLocationClient = new LocationClient(
                 getApplicationContext(),
@@ -153,13 +151,8 @@ public class MainActivity extends FragmentActivity implements
 		MapsInitializer.initialize(this);
 
 		// 最新の現在地が取得出来なかった場合、東京駅付近を表示させる
-//		LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-//		Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-//		double lat = location.getLatitude();
-//		double lng = location.getLongitude();
-//		posMapPoint = new LatLng(lat, lng);
 		builder.target(posMapPoint);	// カメラの表示位置の指定
-		builder.zoom(13.0f);	// カメラのズームレベルの指定
+		builder.zoom(15.0f);	// カメラのズームレベルの指定
 		builder.bearing(0);		// カメラの向きの指定
 		builder.tilt(25.0f);	// カメラの傾きの指定
 		map.moveCamera(CameraUpdateFactory.newCameraPosition(builder.build()));
@@ -169,8 +162,8 @@ public class MainActivity extends FragmentActivity implements
 		map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 			@Override
 		    public void onMapClick(LatLng point) {
-		        Toast.makeText(getApplicationContext(),
-		        		"クリックされた座標は " + point.latitude + ", " + point.longitude, Toast.LENGTH_SHORT).show();
+//		        Toast.makeText(getApplicationContext(),
+//		        		"クリックされた座標は " + point.latitude + ", " + point.longitude, Toast.LENGTH_SHORT).show();
 		    	// 3つのマーカーが表示されていればマーカーを生成しない
 
 				if (mflg < 3) {
@@ -234,47 +227,35 @@ public class MainActivity extends FragmentActivity implements
 				    }
 				});
 
-				//--------------------------------------------------------------------------------------------
-				/**
-				 * 検索ボックスを用意する
-				 * ぐるなび等のAPIにキーワードとピンの座標を引き渡す
-				 */
-
-				// スピナーの設定
-				String[] items = {"居酒屋","観光"};
-				Spinner spinnerGenre = (Spinner) findViewById(R.id.spinnerGenre);
-				// アダプタにアイテムを追加
-				ArrayAdapter<String> adapter = new ArrayAdapter<String>(
-						this,
-						android.R.layout.simple_spinner_item,
-						items);
-				adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-				// アダプタの設定
-				spinnerGenre.setAdapter(adapter);
-				// スピナーのタイトル設定
-				spinnerGenre.setPrompt("ジャンルの選択");
-				// ポジションの指定
-				spinnerGenre.setSelection(0);
-				
-				spinnerGenre.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-					@Override
-					public void onItemSelected(AdapterView<?> parent, View view,
-							int position, long id) {
-						Spinner spnGenre = (Spinner) parent;
-						item = (String) spnGenre.getItemAtPosition(position);
-
-//				    	Toast.makeText(getApplicationContext(),"選択されたアイテムは " + item, Toast.LENGTH_SHORT).show();
+			//--------------------------------------------------------------------------------------------
+			// スピナーの設定
+			String[] items = {"居酒屋","観光"};
+			Spinner spinnerGenre = (Spinner) findViewById(R.id.spinnerGenre);
+			// アダプタにアイテムを追加
+			ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+					this,
+					android.R.layout.simple_spinner_item,
+					items);
+			adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+			// アダプタの設定
+			spinnerGenre.setAdapter(adapter);
+			// スピナーのタイトル設定
+			spinnerGenre.setPrompt("ジャンルの選択");
+			// ポジションの指定
+			spinnerGenre.setSelection(0);
+			
+			spinnerGenre.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+				@Override
+				public void onItemSelected(AdapterView<?> parent, View view,
+						int position, long id) {
+					Spinner spnGenre = (Spinner) parent;
+					item = (String) spnGenre.getItemAtPosition(position);
+					// Do nothing
 					}
 					@Override
 					public void onNothingSelected(AdapterView<?> parent) {
 					}
 				});
-
-				//--------------------------------------------------------------------------------------------
-//				その他
-				/**
-				 * エリア設定のリセット
-				 */
 	}
 
 	@Override
@@ -337,13 +318,34 @@ public class MainActivity extends FragmentActivity implements
 
 	@Override
 	public void onLocationChanged(Location location) {
-		// 現在地に移動
+		// 現在地が取得できた場合、地図を現在地に移動させ、自動で居酒屋検索を開始する。
+		double nlat = location.getLatitude();
+		double nlng = location.getLongitude();
+		
+		//ひとまず自動検索の半径は固定値
+		int auto_rad = 200;
+		
+		 Toast.makeText(getApplicationContext(),
+		 "現在地を取得できたため、自動検索を開始します",
+		 Toast.LENGTH_SHORT).show();
+
+		// 現在地にカメラを移動
 		CameraPosition cameraPos = new CameraPosition.Builder()
-		.target(new LatLng(location.getLatitude(), location.getLongitude())).zoom(13.0f)
+		.target(new LatLng(nlat, nlng)).zoom(15.0f)
 		.bearing(0).build();
 		map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
         mLocationClient.removeLocationUpdates(this);
-		
+        
+        // 現在地を中心に半径Xメートルの円を描画
+		CircleOptions circleOptions = new CircleOptions()
+		.center(new LatLng(nlat, nlng)).radius(auto_rad)
+		.strokeColor(Color.rgb(200, 0, 255))
+		.fillColor(Color.argb(80, 200, 0, 255));
+		circle = map.addCircle(circleOptions);
+
+		// MyAsyncTaskクラスに座標・キーワードを引き渡し、検索を実行する
+		new MyAsyncTask(map, nlat, nlng, auto_rad, item, getApplicationContext(), arrayAdapter).execute("");
+       
 	}
 
 	@Override
@@ -364,8 +366,7 @@ public class MainActivity extends FragmentActivity implements
 
 	@Override
 	public boolean onMyLocationButtonClick() {
-		Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT)
-				.show();
+		// Do nothing
 		return false;
 	}
 

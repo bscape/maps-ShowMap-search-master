@@ -347,7 +347,6 @@ int id activity_chooser_view_content 0x7f070037
 int id always 0x7f07001e
 int id beer1 0x7f070052
 int id beginning 0x7f070023
-int id behind_btn 0x7f07004e
 int id book_now 0x7f070010
 int id buyButton 0x7f07000a
 int id buy_now 0x7f07000f
@@ -376,6 +375,7 @@ int id image 0x7f070039
 int id leftBtn 0x7f070051
 int id listMode 0x7f070014
 int id list_item 0x7f07003b
+int id listview 0x7f07004e
 int id match_parent 0x7f07000c
 int id menu_search 0x7f070053
 int id middle 0x7f070024
