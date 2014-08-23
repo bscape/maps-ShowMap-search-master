@@ -29,7 +29,7 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 	Context context = null;
 	GoogleMap map = null;
 	String genre = null;
-	WebApi webApi = null;
+	Api_Gnavi Api_Gnavi = new Api_Gnavi();
 	double latitude = 0;
 	double longitude = 0;
 	double distance = 0; // 外接円の半径
@@ -55,16 +55,8 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 
 		// ---------------------------------------------------------------------------------------------
 
-		// 使用するWebApiの判定
-		if (genre.equals("居酒屋")) {
-			webApi = new Api_Gnavi();
-		} else if (genre.equals("観光")) {
-			webApi = new Api_YahooLocalSearch();
-		}
-
-		// 各種APIへの検索クエリとなるURLを作成
-		Log.d("createUrl","params[0]="+params[0]+"lat="+String.valueOf(latitude)+"lng="+String.valueOf(longitude));
-		String queryUrl = webApi.createUrl(params[0], String.valueOf(latitude),String.valueOf(longitude));
+		// 検索クエリとなるURLを作成
+		String queryUrl = Api_Gnavi.createUrl(params[0], String.valueOf(latitude),String.valueOf(longitude),genre);
 
 		// ---------------------------------------------------------------------------------------------
 		HttpURLConnection http = null;
@@ -81,7 +73,7 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 			// InputStream型変数inにデータをダウンロード
 			in = http.getInputStream();
 			// 検索結果のxmlから必要なパラメータを切り出す
-			result = webApi.getResult(in);
+			result = Api_Gnavi.getResult(in);
 			// 取得したxmlテキストをonPostExcecuteに引き渡す
 			if (result.equals("")) return "no result";
 			return result;
@@ -90,10 +82,8 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 			return "communication error";
 		} finally {
 			try {
-				if (http != null)
-					http.disconnect();
-				if (in != null)
-					in.close();
+				if (http != null) http.disconnect();
+				if (in != null) in.close();
 			} catch (Exception e) {
 			}
 		}
@@ -144,7 +134,7 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 			lng = 0;
 
 			try {
-				if (webApi.getClass() == this
+				if (Api_Gnavi.getClass() == this
 						.getClass()
 						.getClassLoader()
 						.loadClass("net.buildbox.pokeri.maps_showmap.Api_Gnavi")) {

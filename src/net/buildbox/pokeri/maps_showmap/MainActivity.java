@@ -162,8 +162,6 @@ public class MainActivity extends FragmentActivity implements
 		map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 			@Override
 		    public void onMapClick(LatLng point) {
-//		        Toast.makeText(getApplicationContext(),
-//		        		"クリックされた座標は " + point.latitude + ", " + point.longitude, Toast.LENGTH_SHORT).show();
 		    	// 3つのマーカーが表示されていればマーカーを生成しない
 
 				if (mflg < 3) {
@@ -235,7 +233,7 @@ public class MainActivity extends FragmentActivity implements
 
 		//--------------------------------------------------------------------------------------------
 		// スピナーの設定
-		String[] items = {"居酒屋","観光"};
+		String[] items = {"全て","居酒屋","日本料理・郷土料理","すし・魚料理・シーフード","鍋","焼肉・ホルモン","焼き鳥・肉料理・串料理","お好み焼き・粉物","ラーメン・麺料理","ダイニングバー・バー・ビアホール","お酒","和食","洋食","中華"};
 		Spinner spinnerGenre = (Spinner) findViewById(R.id.spinnerGenre);
 		// アダプタにアイテムを追加
 		ArrayAdapter<String> adapter = new ArrayAdapter<String>(
@@ -245,8 +243,6 @@ public class MainActivity extends FragmentActivity implements
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		// アダプタの設定
 		spinnerGenre.setAdapter(adapter);
-		// スピナーのタイトル設定
-		spinnerGenre.setPrompt("ジャンルの選択");
 		// ポジションの指定
 		spinnerGenre.setSelection(0);
 		
@@ -256,12 +252,15 @@ public class MainActivity extends FragmentActivity implements
 					int position, long id) {
 				Spinner spnGenre = (Spinner) parent;
 				item = (String) spnGenre.getItemAtPosition(position);
-				// Do nothing
 				}
 				@Override
 				public void onNothingSelected(AdapterView<?> parent) {
 				}
 			});
+		
+
+		Log.d("oX oY ","oX=" + oX + "oY=" + oY);
+
 	}
 
 	@Override
@@ -293,9 +292,6 @@ public class MainActivity extends FragmentActivity implements
 		oY = ((tmp[2] * tmp[3]) - (tmp[5] * tmp[0]))
 				/ ((tmp[0] * tmp[4]) - (tmp[3] * tmp[1]));
 
-		// double dx = Math.pow(oX - pointarray[0].longitude / 0.0091, 2);
-		// double dy = Math.pow(oY - pointarray[0].latitude /0.0111, 2);
-
 		// 螟門ｿ?縺ｮ蜊雁ｾ?繧定ｨ育ｮ励??
 		double r = 6378.137; // 襍､驕灘濠蠕Ъkm]
 		// 螟門ｿ?
@@ -325,11 +321,11 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	public void onLocationChanged(Location location) {
 		// 現在地が取得できた場合、地図を現在地に移動させ、自動で居酒屋検索を開始する。
-		double nlat = location.getLatitude();
-		double nlng = location.getLongitude();
+		oY = location.getLatitude();
+		oX = location.getLongitude();
 		
 		//ひとまず自動検索の半径は固定値
-		int auto_rad = 200;
+		distance = 200;
 		
 		 Toast.makeText(getApplicationContext(),
 		 "現在地を取得できたため、自動検索を開始します",
@@ -337,20 +333,20 @@ public class MainActivity extends FragmentActivity implements
 
 		// 現在地にカメラを移動
 		CameraPosition cameraPos = new CameraPosition.Builder()
-		.target(new LatLng(nlat, nlng)).zoom(18.0f)
+		.target(new LatLng(oY, oX)).zoom(18.0f)
 		.bearing(0).build();
 		map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
         mLocationClient.removeLocationUpdates(this);
         
         // 現在地を中心に半径Xメートルの円を描画
 		CircleOptions circleOptions = new CircleOptions()
-		.center(new LatLng(nlat, nlng)).radius(auto_rad)
+		.center(new LatLng(oY, oX)).radius(distance)
 		.strokeColor(Color.rgb(200, 0, 255))
 		.fillColor(Color.argb(80, 200, 0, 255));
 		circle = map.addCircle(circleOptions);
 
 		// MyAsyncTaskクラスに座標・キーワードを引き渡し、検索を実行する
-		new MyAsyncTask(map, nlat, nlng, auto_rad, item, getApplicationContext(), arrayAdapter).execute("");
+		new MyAsyncTask(map, oY, oX, distance, item, getApplicationContext(), arrayAdapter).execute("");
        
 	}
 
@@ -396,16 +392,14 @@ public class MainActivity extends FragmentActivity implements
 			public boolean onQueryTextSubmit(String query) {
 				// アクションバーを取得
 				ActionBar actionBar = getActionBar();
-				// 外心の緯度・経度
-				double latitude = oY;
-				double longitude = oX;
 
 				// 検索キーワードをタイトルに設定
 				actionBar.setTitle(query);
 
 				// MyAsyncTaskクラスに座標・キーワードを引き渡し、検索を実行する
-				if (mflg == 3){
-				new MyAsyncTask(map, latitude, longitude, distance, item, getApplicationContext(), arrayAdapter).execute(query);
+				// 検索範囲として3点指定済み、もしくは現在地取得済みの場合、検索を実行する
+				if (mflg == 3 || circle != null){
+				new MyAsyncTask(map, oY, oX, distance, item, getApplicationContext(), arrayAdapter).execute(query);
 				 }else{
 				 Toast.makeText(getApplicationContext(),
 				 "検索範囲の指定が不足しています。3点で指定してください。",

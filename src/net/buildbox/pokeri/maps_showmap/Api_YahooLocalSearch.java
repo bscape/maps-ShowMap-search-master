@@ -9,7 +9,7 @@ import android.util.Log;
 public class Api_YahooLocalSearch extends WebApi {
 
 	@Override
-	String createUrl(String query, String lat, String lng) {
+	String createUrl(String query, String lat, String lng, String opt) {
 
 		String queryUrl = "http://search.olp.yahooapis.jp/OpenLocalPlatform/V1/localSearch";
         String apiKey = "dj0zaiZpPTF4b21pU1duRVpIUyZzPWNvbnN1bWVyc2VjcmV0Jng9Yjc-";

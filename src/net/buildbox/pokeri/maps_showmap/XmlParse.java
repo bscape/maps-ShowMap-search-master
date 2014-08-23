@@ -15,7 +15,7 @@ public class XmlParse {
 		String result = "";
 		boolean idFlg = false;
 		
-		//tag[0]?[x]で受け取ったタグをxmlの中から探し、１店舗１行のカンマ区切りテキストに整形する
+		//tag[0]～[x]で受け取ったタグをxmlの中から探し、１店舗１行のカンマ区切りテキストに整形する
 		
 		//XmlPullParserのインスタンスを生成
 		final XmlPullParser xmlPullParser = Xml.newPullParser();
