@@ -10,6 +10,12 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+
+import net.buildbox.pokeri.maps_showmap.MainActivity.ListAdapter;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -38,12 +44,13 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 	double distance = 0; // 外接円の半径
     public  ProgressDialog m_ProgressDialog = null;
 	
-	private ArrayAdapter<String> arrayAdapter = null; //　sideviewのlist追加用アダプタ
-
+	//private ArrayAdapter<ItemBean> arrayAdapter = null; //　sideviewのlist追加用アダプタ
+    private ListAdapter arrayAdapter = null;
+    
 	// コンストラクタでメインスレッド（MainActivity.java）のmapや外心座標等を受け取る
 
 	public MyAsyncTask(GoogleMap tmp_map, double tmp_latitude, double tmp_longitude,
-			int tmp_distance, String tmp_genre, Context tmp_con, ArrayAdapter<String> tmp_arrayAdapter) {
+			int tmp_distance, String tmp_genre, Context tmp_con, ListAdapter tmp_arrayAdapter) {
 
 		map = tmp_map;
 		latitude = tmp_latitude;
@@ -149,6 +156,9 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 		arrayAdapter.clear();
 		// 表示できる検索結果があったかどうかのフラグ
 		boolean markerFlg = false;
+		
+		
+		ArrayList<ItemBean> list = new ArrayList<ItemBean>();
 
 		for (int i = 0; i < strAry.length; i++) {
 
@@ -200,11 +210,27 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 				// ピンを地図上に追加
 				resultMarker[i] = map.addMarker(options);
 				//　お店の名前、URL、電話番号をsideviewに追加。
-				arrayAdapter.add(strAry2[1]+"\n"+strAry2[4]+"\n"+strAry2[5]+"\n");
+				//arrayAdapter.add(strAry2[1]+"\n"+strAry2[4]+"\n"+strAry2[5]+"\n");
+				//ItemBean item = new ItemBean();
+				ItemBean item = new ItemBean();
+				item.setName(strAry2[1]);
+				item.setUrl(strAry2[4]);
+				item.setRange(distance2);
+				//ArrayList<ItemBean> list = new ArrayList<ItemBean>();
+				list.add(item);
+				//ListAdapter adapter = new ListAdapter(getApplicationContext(),list);
+				//listview.setadapter(adapter);
 				// 「表示できる検索結果があった」ことのフラグを立てる
+				//arrayAdapter.add(item);
 				markerFlg = true;
 			}
 		}
+		Collections.sort(list, new Rangesort());
+		Iterator<ItemBean> it = list.iterator();
+        while (it.hasNext()) {
+            ItemBean ib = it.next();
+            arrayAdapter.add(ib);
+        }
 		
 		if (! markerFlg){
 			 Toast.makeText(context.getApplicationContext(),
@@ -214,3 +240,24 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 		
 	}
 }
+
+class Rangesort implements Comparator<ItemBean>{
+    //比較メソッド（データクラスを比較して-1, 0, 1を返すように記述する）
+    public int compare(ItemBean a, ItemBean b) {
+        double no1 = a.getRange();
+        double no2 = b.getRange();
+
+        //こうすると社員番号の昇順でソートされる
+        if (no1 > no2) {
+            return 1;
+
+        } else if (no1 == no2) {
+            return 0;
+
+        } else {
+            return -1;
+
+        }
+    }
+}
+

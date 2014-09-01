@@ -1,6 +1,7 @@
 package net.buildbox.pokeri.maps_showmap;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -21,9 +22,11 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -31,6 +34,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.SearchView.OnQueryTextListener;
 import android.graphics.Color;
@@ -51,7 +55,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.location.Location;
-import android.location.LocationManager;
 import static java.lang.Math.*;
 
 //--------------------------------------------------------------------------------------------	
@@ -73,7 +76,7 @@ public class MainActivity extends FragmentActivity implements
 	private Circle circle = null;	
 	private SimpleSideDrawer mNav;
 	private ListView listView = null;
-	private ArrayAdapter<String> arrayAdapter = null;
+	private ListAdapter l_adapter = null;
 	private String query = "居酒屋";
 	private int backflg = 0;
 	private boolean getlocatinflg = false;
@@ -100,8 +103,10 @@ public class MainActivity extends FragmentActivity implements
 		setContentView(R.layout.activity_main);
 		
 		// sideviewへのlist追加用アダプタを宣言
-		arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1);
-		
+//		arrayAdapter = new ArrayAdapter<ItemBean>(MainActivity.this, android.R.layout.simple_list_item_1);
+        List<ItemBean> list = new ArrayList<ItemBean>();
+        l_adapter = new ListAdapter(getApplicationContext(),list);
+        
 		// sideview表示関数、レイアウトの呼び出し
 		mNav = new SimpleSideDrawer(this);
         mNav.setLeftBehindContentView(R.layout.activity_behind_left_simple);
@@ -109,26 +114,8 @@ public class MainActivity extends FragmentActivity implements
             @Override 
             public void onClick(View v) {
                 mNav.toggleLeftDrawer();
-                listView = (ListView)findViewById(R.id.listview);
-                listView.setAdapter(arrayAdapter);
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view,
-                            int position, long id) {
-                        ListView listView = (ListView) parent;
-                        // クリックされたアイテムを取得します
-                        String item = (String) listView.getItemAtPosition(position);
-                        String[] strAry = item.split("\n");
-                        //Toast.makeText(MainActivity.this, item, Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent();
-                        // インテントにアクション及びURLをセット
-                        intent.setAction(Intent.ACTION_VIEW);
-                        intent.setData(Uri.parse(strAry[1]));
-                        // ブラウザ起動
-                        startActivity(intent);
-                        
-                    }
-                });
+                listView =(ListView) findViewById(R.id.list);
+                listView.setAdapter(l_adapter);
             }
         });
 
@@ -262,7 +249,7 @@ public class MainActivity extends FragmentActivity implements
 				
 				if (getlocatinflg || mflg == 3){
 					// MyAsyncTaskクラスに座標・キーワードを引き渡し、検索を実行する
-					new MyAsyncTask(map, oY, oX, distance, item, MainActivity.this, arrayAdapter).execute("");
+					new MyAsyncTask(map, oY, oX, distance, item, MainActivity.this, l_adapter).execute("");
 					// アクションバーを取得
 					ActionBar actionBar = getActionBar();
 					// 検索キーワードをタイトルに設定
@@ -279,6 +266,40 @@ public class MainActivity extends FragmentActivity implements
 			});
 	}
 
+	//SideView表示用リストのクラス定義
+	public class  ListAdapter extends ArrayAdapter<ItemBean>{
+		private LayoutInflater mInflater;
+		private TextView mTitle;
+		
+		public ListAdapter(Context context, List<ItemBean> objects) {
+			super(context, 0, objects);
+			mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		}
+		
+		public View getView(final int position, View convertView, ViewGroup parent) {
+			if (convertView == null) {
+				convertView = mInflater.inflate(R.layout.row, null);
+				}
+			final ItemBean item = this.getItem(position);
+			if(item != null){
+				mTitle = (TextView)convertView.findViewById(R.id.nameText);
+				//Listに追加情報からお店の名前をget
+				mTitle.setText(item.getName());
+				//Listに表示する文字の色を決定
+				mTitle.setTextColor(0xffff0000);
+				//ClickしたときにWeb連携させる
+				mTitle.setOnClickListener(new OnClickListener() {
+					public void onClick(View v) {
+						Uri uri = Uri.parse(item.getUrl());
+						Intent i = new Intent(Intent.ACTION_VIEW,uri);
+						startActivity(i);
+						}
+					});
+				}
+			return convertView;
+			}
+		}
+	
 	// 画面が回転しても状態をセーブするようにする
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
@@ -405,7 +426,7 @@ public class MainActivity extends FragmentActivity implements
 		circle = map.addCircle(circleOptions);
 
 		// MyAsyncTaskクラスに座標・キーワードを引き渡し、検索を実行する
-		new MyAsyncTask(map, oY, oX, distance, item, MainActivity.this, arrayAdapter).execute("");
+		new MyAsyncTask(map, oY, oX, distance, item, MainActivity.this, l_adapter).execute("");
 		// 戻るボタンのフラグを初期化
 		backflg = 0;
 		// 現在地取得に成功したフラグを立てる
@@ -468,7 +489,7 @@ public class MainActivity extends FragmentActivity implements
 				// MyAsyncTaskクラスに座標・キーワードを引き渡し、検索を実行する
 				// 検索範囲として3点指定済み、もしくは現在地取得済みの場合、検索を実行する
 				if (mflg == 3 || circle != null){
-					new MyAsyncTask(map, oY, oX, distance, item, MainActivity.this, arrayAdapter).execute(query);
+					new MyAsyncTask(map, oY, oX, distance, item, MainActivity.this, l_adapter).execute(query);
 					Log.d("distance", ""+distance);
 					// 戻るボタンのフラグを初期化
 					backflg = 0;
