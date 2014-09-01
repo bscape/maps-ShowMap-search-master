@@ -8,4 +8,6 @@
     <string name="result">検索結果一覧</string>
     <string name="start_main">近辺のお店を探すことができます。\n☆クリックして調査開始☆ </string>
     <string name="title_activity_main">☆お店検索☆</string>
+    <string name="nodata">検索結果は0件です。</string>
+    <string name="detail">詳細</string>
 </resources>
