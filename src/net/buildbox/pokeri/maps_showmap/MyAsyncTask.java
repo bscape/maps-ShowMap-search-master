@@ -242,12 +242,12 @@ public class MyAsyncTask extends AsyncTask<String, Integer, String> {
 }
 
 class Rangesort implements Comparator<ItemBean>{
-    //比較メソッド（データクラスを比較して-1, 0, 1を返すように記述する）
+    //　比較メソッド（データクラスを比較して-1, 0, 1を返すように記述する）
     public int compare(ItemBean a, ItemBean b) {
         double no1 = a.getRange();
         double no2 = b.getRange();
 
-        //こうすると社員番号の昇順でソートされる
+        //　距離順でソート
         if (no1 > no2) {
             return 1;
 

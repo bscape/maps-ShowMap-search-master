@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -104,7 +106,7 @@ public class MainActivity extends FragmentActivity implements
 		
 		// sideviewへのlist追加用アダプタを宣言
 //		arrayAdapter = new ArrayAdapter<ItemBean>(MainActivity.this, android.R.layout.simple_list_item_1);
-        List<ItemBean> list = new ArrayList<ItemBean>();
+        final List<ItemBean> list = new ArrayList<ItemBean>();
         l_adapter = new ListAdapter(getApplicationContext(),list);
         
 		// sideview表示関数、レイアウトの呼び出し
@@ -150,7 +152,24 @@ public class MainActivity extends FragmentActivity implements
 		builder.tilt(25.0f);	// カメラの傾きの指定
 		map.moveCamera(CameraUpdateFactory.newCameraPosition(builder.build()));
 
-		
+		// マーカークリックイベント処理
+		map.setOnInfoWindowClickListener(new OnInfoWindowClickListener(){
+		//map.setOnMarkerClickListener(new OnMarkerClickListener(){
+			@Override
+			public void onInfoWindowClick(Marker marker){
+			//public boolean onMarkerClick(Marker marker){
+				ItemBean[] it = (ItemBean[])list.toArray(new ItemBean[list.size()]);
+				for(ItemBean itb : it){
+					Log.d("getName",itb.getName());
+					Log.d("getTitle",marker.getTitle());
+					if(itb.getName().equals(marker.getTitle())){
+					Uri uri = Uri.parse(itb.getUrl());
+					Intent i = new Intent(Intent.ACTION_VIEW,uri);
+					startActivity(i);
+					}
+				}
+			}
+		});
 		// マップ上のクリックイベント処理
 		map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 			@Override
@@ -237,7 +256,7 @@ public class MainActivity extends FragmentActivity implements
 		// アダプタの設定
 		spinnerGenre.setAdapter(adapter);
 		// デフォルトポジションの指定
-		spinnerGenre.setSelection(0);
+		spinnerGenre.setSelection(1);
 		// プルダウンメニュー選択操作のリスナー
 		spinnerGenre.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			@Override
